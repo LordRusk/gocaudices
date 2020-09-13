@@ -29,13 +29,6 @@ var (
 	sigChan = make(chan os.Signal, len(Blocks))
 )
 
-func watchSignals(sigChan <-chan os.Signal) {
-	for {
-		sig := <- sigChan
-		log.Println(sig)
-	}
-}
-
 func execBlock(command string) (string, error) {
 	newStringBytes, err := exec.Command(Shell, RunIn, command).Output()
 	if err != nil {
