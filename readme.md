@@ -7,8 +7,12 @@ Dwmblocks in incredibly poorly written, it gets the job done, but not very well.
 ## Example
 I've left an example of a normal `blocks.h` config file, and the equivalent `blocks.go` found in the file of the same name.
 
+## How-To update a module
+
+The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would be updated like `kill -((34+10)) $(pidof goblocks)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof goblocks)") },`.
+
 ## FQA -- Frequently Questioned Answers
 
 + Does it have bar click-ability?
 
-	 Not right now, after I work out a few kinks i'll write a patch that willbe compatibal with the patch already on suckless for bar clickablity.
+	 Not right now, after I work out a few kinks I'll write a patch that will be compatible with the patch already on suckless.org for bar click-ablity.
