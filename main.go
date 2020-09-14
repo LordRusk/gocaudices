@@ -68,7 +68,6 @@ func runBlock(block Block, updateChan chan<- blockUpdate) {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	}
 
-	barStringArr[block.Pos] = newString
 	blockUpdate.newString = newString
  	updateChan <- blockUpdate
 }
