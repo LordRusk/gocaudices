@@ -5,6 +5,7 @@ var (
 	Shell = "dash" /* shell that will be used to run the commands */
 	RunIn = "-c" /* shell opt to read from command string */
 	Delim = " " /* the delimiter that will be used */
+	Receivers = 6 /* They amount of receivers that can receive a blockUpdate | If 0 value is given, it will default to 1 */
 
 	Blocks = []Block {
 			     /* command */            /* update interval */    /* update sig */

@@ -13,6 +13,11 @@ import (
 	"os/signal"
 )
 
+type blockUpdate struct  {
+	pos int
+	newString string
+}
+
 type Block struct {
 	Cmd string
 	UpInt int
@@ -22,6 +27,7 @@ type Block struct {
 
 var (
 	sigChan = make(chan os.Signal, len(Blocks))
+	updateChan = make(chan blockUpdate, len(Blocks))
 	barStringArr = make([]string, len(Blocks))
 	wg sync.WaitGroup
 )
@@ -54,18 +60,17 @@ func execBlock(command string) (string, error) {
 	return newString, err
 }
 
-func runBlock(block Block) {
+func runBlock(block Block, updateChan chan<- blockUpdate) {
+	blockUpdate := blockUpdate { pos: block.Pos }
+
 	newString, err := execBlock(block.Cmd)
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	}
 
 	barStringArr[block.Pos] = newString
-
-	_, err = exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
-	if err != nil {
-		log.Println(err)
-	}
+	blockUpdate.newString = newString
+ 	updateChan <- blockUpdate
 }
 
 func main() {
@@ -75,13 +80,12 @@ func main() {
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
-			runBlock(Blocks[i])
+			runBlock(Blocks[i], updateChan)
 			if Blocks[i].UpInt != 0 {
 				for {
 					time.Sleep(time.Duration(Blocks[i].UpInt) * time.Second)
-					runBlock(Blocks[i])
+					runBlock(Blocks[i], updateChan)
 				}
-				wg.Done()
 			}
 		}(i)
 	}
@@ -105,10 +109,29 @@ func main() {
 			if block, ok := signalMap[int(sigNum)]; !ok {
 				log.Println("Unkown update signal:", psig[1])
 			} else {
-				runBlock(block)
+				runBlock(block, updateChan)
 			}
 		}
 	}()
+
+ 	/* watch for updates */
+	if Receivers == 0 {
+		Receivers++
+	}
+	for i := 0; i < Receivers; i++ {
+		go func() {
+			for {
+				blockUpdate := <- updateChan
+				barStringArr[blockUpdate.pos] = blockUpdate.newString
+
+				_, err := exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
+				if err != nil {
+					log.Println(err)
+				}
+			}
+			wg.Done()
+		}()
+	}
 
 	wg.Wait()
 }
