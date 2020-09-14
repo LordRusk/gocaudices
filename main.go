@@ -13,11 +13,6 @@ import (
 	"os/signal"
 )
 
-type blockUpdate struct  {
-	pos int
-	newString string
-}
-
 type Block struct {
 	Cmd string
 	UpInt int
@@ -27,7 +22,7 @@ type Block struct {
 
 var (
 	sigChan = make(chan os.Signal, len(Blocks))
-	updateChan = make(chan blockUpdate, len(Blocks))
+	updateChan = make(chan bool, len(Blocks))
 	barStringArr = make([]string, len(Blocks))
 	wg sync.WaitGroup
 )
@@ -60,16 +55,15 @@ func execBlock(command string) (string, error) {
 	return newString, err
 }
 
-func runBlock(block Block, updateChan chan<- blockUpdate) {
-	blockUpdate := blockUpdate { pos: block.Pos }
-
+func runBlock(block Block, updateChan chan<- bool) {
 	newString, err := execBlock(block.Cmd)
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
+		updateChan <- false
+	} else {
+		barStringArr[block.Pos] = newString
+ 		updateChan <- true
 	}
-
-	blockUpdate.newString = newString
- 	updateChan <- blockUpdate
 }
 
 func main() {
@@ -121,11 +115,11 @@ func main() {
 		go func() {
 			for {
 				blockUpdate := <- updateChan
-				barStringArr[blockUpdate.pos] = blockUpdate.newString
-
-				_, err := exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
-				if err != nil {
-					log.Println(err)
+				if blockUpdate != false {
+					_, err := exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
+					if err != nil {
+						log.Println(err)
+					}
 				}
 			}
 			wg.Done()
