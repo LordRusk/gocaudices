@@ -1,4 +1,4 @@
-# A dwmblocks alternative written in go
+# An extremely simple dwmblocks alternative
 Goblocks is a dwmblocks alternative written in GO.
 
 ## Why?
