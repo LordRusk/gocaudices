@@ -4,6 +4,7 @@ import (
 	"os"
 	"log"
 	"time"
+	"sync"
 	"regexp"
 	"syscall"
 	"strings"
@@ -11,11 +12,6 @@ import (
 	"os/exec"
 	"os/signal"
 )
-
-type updateBlock struct {
-	blockPos int
-	newString string
-}
 
 type Block struct {
 	Cmd string
@@ -25,9 +21,23 @@ type Block struct {
 }
 
 var (
-	updateChan = make(chan updateBlock, len(Blocks))
 	sigChan = make(chan os.Signal, len(Blocks))
+	barStringArr = make([]string, len(Blocks))
+	wg sync.WaitGroup
 )
+
+func mergeFinalString(stringArr []string) string {
+	var finalString strings.Builder
+
+	for i := 0; i < len(stringArr); i++ {
+		if stringArr[i] != "" {
+			finalString.WriteString(stringArr[i])
+			finalString.WriteString(Delim)
+		}
+	}
+
+	return finalString.String()
+}
 
 func execBlock(command string) (string, error) {
 	newStringBytes, err := exec.Command(Shell, RunIn, command).Output()
@@ -44,30 +54,34 @@ func execBlock(command string) (string, error) {
 	return newString, err
 }
 
-func runBlock(block Block, updateChan chan<- updateBlock) {
-	updateBlock := updateBlock { blockPos: block.Pos }
-
+func runBlock(block Block) {
 	newString, err := execBlock(block.Cmd)
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	}
 
-	updateBlock.newString = newString
-	updateChan <- updateBlock
+	barStringArr[block.Pos] = newString
+
+	_, err = exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func main() {
+	wg.Add(1)
+
 	/* get all the blocks running */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
-			runBlock(Blocks[i], updateChan)
+			runBlock(Blocks[i])
 			if Blocks[i].UpInt != 0 {
 				for {
 					time.Sleep(time.Duration(Blocks[i].UpInt) * time.Second)
-
-					runBlock(Blocks[i], updateChan)
+					runBlock(Blocks[i])
 				}
+				wg.Done()
 			}
 		}(i)
 	}
@@ -91,31 +105,10 @@ func main() {
 			if block, ok := signalMap[int(sigNum)]; !ok {
 				log.Println("Unkown update signal:", psig[1])
 			} else {
-				runBlock(block, updateChan)
+				runBlock(block)
 			}
 		}
 	}()
 
-	/* build the original []string */
-	barStringArr := make([]string, len(Blocks))
-	for i := 0; i < len(Blocks); i++ {
-		updatedBlock := <- updateChan
-		barStringArr[updatedBlock.blockPos] = updatedBlock.newString
-
-		_, err := exec.Command(Shell, RunIn, string("xsetroot -name \"Building Blocks... "+strconv.FormatInt(int64(i+1), 10)+" of "+strconv.FormatInt(int64(len(barStringArr)), 10)+"\"")).Output()
-		if err != nil {
-			log.Println(err)
-		}
-	}
-
-	/* watch for updates and update accordingly */
-	for {
-		updatedBlock := <- updateChan
-		barStringArr[updatedBlock.blockPos] = updatedBlock.newString
-
-		_, err := exec.Command(Shell, RunIn, string("xsetroot -name \""+strings.Join(barStringArr[:], Delim)+"\"")).Output()
-		if err != nil {
-			log.Println(err)
-		}
-	}
+	wg.Wait()
 }
