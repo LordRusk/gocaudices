@@ -116,10 +116,7 @@ func main() {
 			for {
 				blockUpdate := <- updateChan
 				if blockUpdate != false {
-					_, err := exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
-					if err != nil {
-						log.Println(err)
-					}
+					exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
 				}
 			}
 			wg.Done()
