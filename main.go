@@ -58,7 +58,7 @@ func execBlock(command string) (string, error) {
 func runBlock(block Block, updateChan chan<- bool) {
 	newString, err := execBlock(block.Cmd)
 	if err != nil {
-		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
+		log.Println("Failed to update", block.Cmd, "--", err)
 		updateChan <- false
 	} else {
 		barStringArr[block.Pos] = newString
