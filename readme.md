@@ -14,7 +14,7 @@ Goblocks can be configured through adding `Blocks` in the `blocks.go` file. Add 
 
 - Update a module
 
-The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would be updated like `kill -((34+10)) $(pidof goblocks)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof goblocks)") },`.
+The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would be updated like `kill -$((34+10)) $(pidof goblocks)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof goblocks)") },`.
 
 ## FQA -- Frequently Questioned Answers
 
