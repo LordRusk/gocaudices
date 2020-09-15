@@ -117,7 +117,7 @@ func main() {
 			for {
 				blockUpdate := <- updateChan
 				if blockUpdate != false {
-					exec.Command("/bin/xsetroot", "-name", "\""+mergeFinalString(barStringArr)+"\"").Output()
+					exec.Command("/bin/xsetroot", "-name", mergeFinalString(barStringArr)).Output()
 				}
 			}
 
