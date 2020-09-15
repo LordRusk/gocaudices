@@ -74,6 +74,7 @@ func main() {
 		go func(i int) {
 			Blocks[i].Pos = i
 			runBlock(Blocks[i], updateChan)
+			time.Sleep(time.Duration(i) * (time.Millisecond * 2))
 			if Blocks[i].UpInt != 0 {
 				for {
 					time.Sleep(time.Duration(Blocks[i].UpInt) * time.Second)
@@ -119,6 +120,7 @@ func main() {
 					exec.Command(Shell, RunIn, string("xsetroot -name \""+mergeFinalString(barStringArr)+"\"")).Output()
 				}
 			}
+
 			wg.Done()
 		}()
 	}
