@@ -18,7 +18,7 @@ The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would
 
 ## (Non)-Features
 
-+ Goscrape automatically removes whitespace from the end of blocks to keep the bar looking nice
++ Goblocks automatically removes whitespace from the end of blocks to keep the bar looking nice.
 
 ## FQA -- Frequently Questioned Answers
 
