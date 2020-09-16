@@ -1,30 +1,28 @@
 package main
 
 import (
-	"os"
+	"bytes"
 	"log"
-	"time"
-	"sync"
-	"regexp"
-	"syscall"
-	"strings"
-	"strconv"
+	"os"
 	"os/exec"
 	"os/signal"
+	"strconv"
+	"strings"
+	"syscall"
+	"time"
 )
 
 type Block struct {
-	Cmd string
+	Cmd   string
 	UpInt int
 	UpSig int
-	Pos int
+	Pos   int
 }
 
 var (
-	sigChan = make(chan os.Signal, len(Blocks))
-	updateChan = make(chan bool, len(Blocks))
+	sigChan      = make(chan os.Signal, len(Blocks))
+	updateChan   = make(chan bool, len(Blocks))
 	barStringArr = make([]string, len(Blocks))
-	wg sync.WaitGroup
 )
 
 func mergeFinalString(stringArr []string) string {
@@ -41,18 +39,26 @@ func mergeFinalString(stringArr []string) string {
 }
 
 func execBlock(command string) (string, error) {
-	newStringBytes, err := exec.Command(Shell, RunIn, command).Output()
-	if err != nil {
-		return "", err
+	pcommand := strings.Split(command, " ")
+	if len(pcommand) >= 1 {
+		outputBytes, err := exec.Command(pcommand[0], pcommand[1:]...).Output()
+		if err != nil {
+			return "", err
+		}
+
+		outputBytes = bytes.TrimSpace(outputBytes)
+
+		return string(outputBytes), err
+	} else {
+		outputBytes, err := exec.Command(command).Output()
+		if err != nil {
+			return "", err
+		}
+
+		outputBytes = bytes.TrimSpace(outputBytes)
+
+		return string(outputBytes), err
 	}
-
-	newString := string(newStringBytes)
-	re := regexp.MustCompile(` +\n`)
-	newString = re.ReplaceAllString(string(newString), "")
-	re = regexp.MustCompile(`\n`)
-	newString = re.ReplaceAllString(string(newString), "")
-
-	return newString, err
 }
 
 func runBlock(block Block, updateChan chan<- bool) {
@@ -60,16 +66,16 @@ func runBlock(block Block, updateChan chan<- bool) {
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	} else {
-		barStringArr[block.Pos] = newString
-		if len(updateChan) == 0 {
- 			updateChan <- true
+		if barStringArr[block.Pos] != newString {
+			barStringArr[block.Pos] = newString
+			if len(updateChan) == 0 {
+				updateChan <- true
+			}
 		}
 	}
 }
 
 func main() {
-	wg.Add(1)
-
 	/* get all the blocks running */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
@@ -94,7 +100,7 @@ func main() {
 
 	go func() {
 		for {
-			sig := <- sigChan
+			sig := <-sigChan
 			psig := strings.Split(sig.String(), " ")
 			sigNum, err := strconv.ParseInt(psig[1], 0, 64)
 			if err != nil {
@@ -109,22 +115,19 @@ func main() {
 		}
 	}()
 
- 	/* watch for updates */
-	if Receivers == 0 {
+	/* watch for updates */
+	if Receivers < 1 {
 		Receivers++
 	}
 	for i := 0; i < Receivers; i++ {
 		go func() {
-			for {
-				blockUpdate := <- updateChan
+			for blockUpdate := range updateChan {
 				if blockUpdate != false {
-					exec.Command("/bin/xsetroot", "-name", mergeFinalString(barStringArr)).Output()
+					exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
 				}
 			}
-
-			wg.Done()
 		}()
 	}
 
-	wg.Wait()
+	select {}
 }
