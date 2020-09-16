@@ -47,7 +47,7 @@ func execBlock(command string) (string, error) {
 	}
 
 	newString := string(newStringBytes)
-	re := regexp.MustCompile(` \n`)
+	re := regexp.MustCompile(` +\n`)
 	newString = re.ReplaceAllString(string(newString), "")
 	re = regexp.MustCompile(`\n`)
 	newString = re.ReplaceAllString(string(newString), "")
@@ -58,11 +58,12 @@ func execBlock(command string) (string, error) {
 func runBlock(block Block, updateChan chan<- bool) {
 	newString, err := execBlock(block.Cmd)
 	if err != nil {
-		log.Println("Failed to update", block.Cmd, "--", err)
-		updateChan <- false
+		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	} else {
 		barStringArr[block.Pos] = newString
- 		updateChan <- true
+		if len(updateChan) == 0 {
+ 			updateChan <- true
+		}
 	}
 }
 

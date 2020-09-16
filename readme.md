@@ -16,6 +16,10 @@ Goblocks can be configured through adding `Blocks` in the `blocks.go` file. Add 
 
 The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would be updated like `kill -$((34+10)) $(pidof goblocks)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof goblocks)") },`.
 
+## (Non)-Features
+
++ Goscrape automatically removes whitespace from the end of blocks to keep the bar looking nice
+
 ## FQA -- Frequently Questioned Answers
 
 + Does it have bar click-ability?

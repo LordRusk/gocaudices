@@ -2,10 +2,10 @@ package main
 
 var (
 	/* config */
-	Shell = "sh" /* shell that will be used to run the commands */
+	Shell = "dash" /* shell that will be used to run the commands */
 	RunIn = "-c" /* shell opt to read from command string */
 	Delim = " " /* the delimiter that will be used */
-	Receivers = 6 /* They amount of receivers that can receive a blockUpdate | If 0 value is given, it will default to 1 */
+	Receivers = 3 /* They amount of receivers that can receive a blockUpdate | If 0 value is given, it will default to 1 */
 
 	Blocks = []Block {
 			     /* command */            /* update interval */    /* update sig */
@@ -17,8 +17,8 @@ var (
 		//Block { Cmd: 	"crypto",	UpInt:		18000,	UpSig:		17, },
 		Block { Cmd: 	"torrent",	UpInt:		20,	UpSig:		7, },
 		Block { Cmd: 	"memory",	UpInt:		10,	UpSig:		14, },
-		Block { Cmd: 	"cpu",		UpInt:		10,	UpSig:		13, },
-		Block { Cmd: 	"cpubars",	UpInt:		10,	UpSig:		22, },
+		Block { Cmd: 	"cpu",		UpInt:		3,	UpSig:		13, },
+		Block { Cmd: 	"cpubars",	UpInt:		1,	UpSig:		22, },
 		Block { Cmd: 	"disk /home",	UpInt:		10,	UpSig:		15, },
 		Block { Cmd: 	"disk",		UpInt:		10,	UpSig:		15, },
 		Block { Cmd: 	"astrological",	UpInt:		18000,	UpSig:		18, },
