@@ -121,10 +121,8 @@ func main() {
 	}
 	for i := 0; i < Receivers; i++ {
 		go func() {
-			for blockUpdate := range updateChan {
-				if blockUpdate != false {
-					exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
-				}
+			for _ = range updateChan {
+				exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
 			}
 		}()
 	}
