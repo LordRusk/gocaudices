@@ -39,26 +39,15 @@ func mergeFinalString(stringArr []string) string {
 }
 
 func execBlock(command string) (string, error) {
-	pcommand := strings.Split(command, " ")
-	if len(pcommand) >= 1 {
-		outputBytes, err := exec.Command(pcommand[0], pcommand[1:]...).Output()
-		if err != nil {
-			return "", err
-		}
-
-		outputBytes = bytes.TrimSpace(outputBytes)
-
-		return string(outputBytes), err
-	} else {
-		outputBytes, err := exec.Command(command).Output()
-		if err != nil {
-			return "", err
-		}
-
-		outputBytes = bytes.TrimSpace(outputBytes)
-
-		return string(outputBytes), err
+	outputBytes, err := exec.Command(Shell, RunIn, command).Output()
+	if err != nil {
+		return "", err
 	}
+
+	outputBytes = bytes.TrimSpace(outputBytes)
+
+	return string(outputBytes), err
+
 }
 
 func runBlock(block Block, updateChan chan<- bool) {

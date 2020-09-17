@@ -2,8 +2,10 @@ package main
 
 var (
 	/* config */
-	Delim     = " " /* the delimiter that will be used */
-	Receivers = 6
+	Delim     = " "    /* the delimiter that will be used */
+	Shell     = "dash" /* the shell to run the scripts in */
+	RunIn     = "-c"   /* arg to make Shell run command from stdin */
+	Receivers = 6      /* they amount of modules waiting for block updates | if value is less then 1, it will revert to 1 */
 
 	Blocks = []Block{
 		/* command */ /* update interval */ /* update sig */
