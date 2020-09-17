@@ -17,7 +17,7 @@ var (
 		// Block{Cmd: "crypto", UpInt: 18000, UpSig: 17},
 		Block{Cmd: "torrent", UpInt: 20, UpSig: 7},
 		Block{Cmd: "memory", UpInt: 10, UpSig: 14},
-		Block{Cmd: "cpu", UpInt: 3, UpSig: 13},
+		Block{Cmd: "cpu", UpInt: 1, UpSig: 13},
 		Block{Cmd: "cpubars", UpInt: 1, UpSig: 22},
 		Block{Cmd: "disk /home", UpInt: 10, UpSig: 15},
 		Block{Cmd: "disk", UpInt: 10, UpSig: 15},
