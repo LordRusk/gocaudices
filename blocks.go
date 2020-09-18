@@ -36,7 +36,7 @@ var (
 	}
 )
 
-/* Quick list of modules Update Signals
+/* quick list of block update signals
  * 1 clock
  * 2 sip
  * 3 battery

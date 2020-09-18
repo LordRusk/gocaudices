@@ -105,7 +105,7 @@ func main() {
 
 	/* watch for updates */
 	if Receivers < 1 {
-		Receivers++
+		Receivers = 1
 	}
 	for i := 0; i < Receivers; i++ {
 		go func() {
