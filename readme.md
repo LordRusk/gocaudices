@@ -5,13 +5,13 @@ Gocaudices is a dwmblocks alternative written in GO.
 Dwmblocks in incredibly poorly written, it gets the job done, but not very well. I wrote this alternative to be simple, fast, and elegant.
 
 ## Example
-I've left an example of a normal `blocks.h` config file, and the equivalent `blocks.go` found in the file of the same name.
+I've left an example of a normal `blocks.h` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm)
 
 ## How-To
 
 - Configure gocaudices
 
-Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts, their update intriguers (0 means it will only update on signal), and their update signals.
+Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts or commands, their update intriguers (0 means it will only update on signal), and their update signals.
 
 - Update a module
 
