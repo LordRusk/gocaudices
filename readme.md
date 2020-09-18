@@ -5,7 +5,7 @@ Gocaudices is a dwmblocks alternative written in GO.
 Dwmblocks in incredibly poorly written, it gets the job done, but not very well. I wrote this alternative to be simple, fast, and elegant.
 
 ## Example
-I've left an example of a normal `blocks.h` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm)
+I've left an example of a normal `blocks.go` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm)
 
 ## How-To
 
