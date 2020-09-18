@@ -1,5 +1,5 @@
 # An extremely simple dwmblocks alternative
-Goblocks is a dwmblocks alternative written in GO.
+Gocaudices is a dwmblocks alternative written in GO.
 
 ## Why?
 Dwmblocks in incredibly poorly written, it gets the job done, but not very well. I wrote this alternative to be simple, fast, and elegant.
@@ -8,17 +8,18 @@ Dwmblocks in incredibly poorly written, it gets the job done, but not very well.
 I've left an example of a normal `blocks.h` config file, and the equivalent `blocks.go` found in the file of the same name.
 
 ## How-To
-- Configure goblocks
 
-Goblocks can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts, their update intriguers (0 means it will only update on signal), and their update signals.
+- Configure gocaudices
+
+Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts, their update intriguers (0 means it will only update on signal), and their update signals.
 
 - Update a module
 
-The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would be updated like `kill -$((34+10)) $(pidof goblocks)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof goblocks)") },`.
+The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would be updated like `kill -$((34+10)) $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof gocaudices)") },`.
 
 ## (Non)-Features
 
-+ Goblocks automatically removes whitespace from the end of blocks to keep the bar looking nice.
++ Gocaudices automatically removes whitespace from the end of blocks to keep the bar looking nice.
 
 ## FQA -- Frequently Questioned Answers
 
