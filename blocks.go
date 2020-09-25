@@ -9,7 +9,7 @@ var (
 
 	Blocks = []Block{
 		/* command */ /* update interval */ /* update sig */
-		// Block{Cmd: "cat /tmp/recordingicon 2>/dev/null", UpInt: 0, UpSig: 9},
+		Block{Cmd: "cat /tmp/recordingicon 2>/dev/null", UpInt: 0, UpSig: 9},
 		// Block{Cmd: "music", UpInt: 0, UpSig: 11},
 		Block{Cmd: "pacpackages", UpInt: 0, UpSig: 8},
 		Block{Cmd: "news", UpInt: 0, UpSig: 6},
@@ -36,7 +36,7 @@ var (
 	}
 )
 
-/* quick list of block update signals
+/* Quick list of modules Update Signals
  * 1 clock
  * 2 sip
  * 3 battery

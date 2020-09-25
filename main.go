@@ -38,7 +38,7 @@ func mergeFinalString(stringArr []string) string {
 	return finalString.String()
 }
 
-func execCmd(command string) (string, error) {
+func execBlock(command string) (string, error) {
 	outputBytes, err := exec.Command(Shell, RunIn, command).Output()
 	if err != nil {
 		return "", err
@@ -51,7 +51,7 @@ func execCmd(command string) (string, error) {
 }
 
 func runBlock(block Block, updateChan chan<- bool) {
-	newString, err := execCmd(block.Cmd)
+	newString, err := execBlock(block.Cmd)
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	} else {
@@ -70,7 +70,7 @@ func main() {
 		go func(i int) {
 			Blocks[i].Pos = i
 			runBlock(Blocks[i], updateChan)
-			if Blocks[i].UpInt <= 0 {
+			if Blocks[i].UpInt != 0 {
 				for {
 					time.Sleep(time.Duration(Blocks[i].UpInt) * time.Second)
 					runBlock(Blocks[i], updateChan)
@@ -108,6 +108,7 @@ func main() {
 		Receivers = 1
 	}
 	for i := 0; i < Receivers; i++ {
+		log.Println("Reciever", i, "started!")
 		go func() {
 			for _ = range updateChan {
 				exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
