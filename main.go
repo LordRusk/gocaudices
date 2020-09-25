@@ -99,7 +99,6 @@ func main() {
 		Receivers = 1
 	}
 	for i := 0; i < Receivers; i++ {
-		log.Println("Reciever", i, "started!")
 		go func() {
 			for _ = range updateChan {
 				exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
