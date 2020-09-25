@@ -55,11 +55,9 @@ func runBlock(block Block, updateChan chan<- bool) {
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	} else {
-		if barStringArr[block.Pos] != newString {
-			barStringArr[block.Pos] = newString
-			if len(updateChan) == 0 {
-				updateChan <- true
-			}
+		barStringArr[block.Pos] = newString
+		if len(updateChan) == 0 {
+			updateChan <- true
 		}
 	}
 }
@@ -90,16 +88,9 @@ func main() {
 		for {
 			sig := <-sigChan
 			psig := strings.Split(sig.String(), " ")
-			sigNum, err := strconv.ParseInt(psig[1], 0, 64)
-			if err != nil {
-				log.Println(err)
-			}
-
-			if block, ok := signalMap[int(sigNum)]; !ok {
-				log.Println("Unkown update signal:", psig[1])
-			} else {
-				runBlock(block, updateChan)
-			}
+			sigNum, _ := strconv.Atoi(psig[1])
+			block, _ := signalMap[sigNum]
+			runBlock(block, updateChan)
 		}
 	}()
 
@@ -108,6 +99,7 @@ func main() {
 		Receivers = 1
 	}
 	for i := 0; i < Receivers; i++ {
+		log.Println("Reciever", i, "started!")
 		go func() {
 			for _ = range updateChan {
 				exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
