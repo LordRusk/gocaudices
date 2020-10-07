@@ -30,8 +30,8 @@ func mergeFinalString(stringArr []string) string {
 
 	for i := 0; i < len(stringArr); i++ {
 		if stringArr[i] != "" {
-			finalString.WriteString(stringArr[i])
 			finalString.WriteString(Delim)
+			finalString.WriteString(stringArr[i])
 		}
 	}
 
