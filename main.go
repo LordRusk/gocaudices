@@ -64,13 +64,14 @@ func runBlock(block Block, updateChan chan<- bool) {
 }
 
 func main() {
-	X, err := xgb.NewConn()
+	x, err := xgb.NewConn()
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer X.Close()
-	Root := xproto.Setup(X).DefaultScreen(X).Root
+	defer x.Close()
+	root := xproto.Setup(x).DefaultScreen(x).Root
 
+	/* run blocks */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
@@ -103,6 +104,6 @@ func main() {
 	/* set status on update */
 	for _ = range updateChan {
 		statusText := mergeFinalString(barStringArr)
-		xproto.ChangeProperty(X, xproto.PropModeReplace, Root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(statusText)), []byte(statusText))
+		xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(statusText)), []byte(statusText))
 	}
 }
