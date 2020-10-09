@@ -2,14 +2,13 @@ package main
 
 var (
 	/* config */
-	Delim     = " "    /* the delimiter that will be used */
-	Shell     = "dash" /* the shell to run the scripts in */
-	RunIn     = "-c"   /* arg to make Shell run command from stdin */
-	Receivers = 6      /* they amount of modules waiting for block updates | if value is less then 1, it will revert to 1 */
+	Delim = " "    /* the delimiter that will be used */
+	Shell = "dash" /* the shell to run the scripts in */
+	RunIn = "-c"   /* arg to make Shell run command from stdin */
 
 	Blocks = []Block{
 		/* command */ /* update interval */ /* update sig */
-		Block{Cmd: "cat /tmp/recordingicon 2>/dev/null", UpInt: 0, UpSig: 9},
+		Block{Cmd: "recicon", UpInt: 0, UpSig: 9},
 		// Block{Cmd: "music", UpInt: 0, UpSig: 11},
 		Block{Cmd: "pacpackages", UpInt: 0, UpSig: 8},
 		Block{Cmd: "news", UpInt: 0, UpSig: 6},

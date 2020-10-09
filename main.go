@@ -24,8 +24,8 @@ type Block struct {
 }
 
 var (
-	sigChan      = make(chan os.Signal, len(Blocks))
-	updateChan   = make(chan bool, len(Blocks))
+	sigChan      = make(chan os.Signal, 512)
+	updateChan   = make(chan bool, 512)
 	barStringArr = make([]string, len(Blocks))
 
 	/* setup X */
@@ -70,9 +70,7 @@ func runBlock(block Block, updateChan chan<- bool) {
 		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
 	} else {
 		barStringArr[block.Pos] = newString
-		if len(updateChan) == 0 {
-			updateChan <- true
-		}
+		updateChan <- true
 	}
 }
 
@@ -99,8 +97,7 @@ func main() {
 	}
 
 	go func() {
-		for {
-			sig := <-sigChan
+		for sig := range sigChan {
 			psig := strings.Split(sig.String(), " ")
 			sigNum, _ := strconv.Atoi(psig[1])
 			block, _ := signalMap[sigNum]
@@ -109,17 +106,7 @@ func main() {
 	}()
 
 	/* watch for updates */
-	if Receivers < 1 {
-		Receivers = 1
+	for _ = range updateChan {
+		setStatus(C.CString(mergeFinalString(barStringArr)))
 	}
-	for i := 0; i < Receivers; i++ {
-		go func() {
-			for _ = range updateChan {
-				//exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
-				setStatus(C.CString(mergeFinalString(barStringArr)))
-			}
-		}()
-	}
-
-	select {}
 }
