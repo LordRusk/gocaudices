@@ -1,9 +1,5 @@
 package main
 
-// #cgo LDFLAGS: -lX11
-// #include <X11/Xlib.h>
-import "C"
-
 import (
 	"bytes"
 	"log"
@@ -14,6 +10,9 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/BurntSushi/xgb"
+	"github.com/BurntSushi/xgb/xproto"
 )
 
 type Block struct {
@@ -27,16 +26,13 @@ var (
 	sigChan      = make(chan os.Signal, 512)
 	updateChan   = make(chan bool, 512)
 	barStringArr = make([]string, len(Blocks))
-
-	/* setup X */
-	dpy    = C.XOpenDisplay(nil)
-	screen = C.XDefaultScreen(dpy)
-	root   = C.XRootWindow(dpy, screen)
+	X            *xgb.Conn
+	Root         xproto.Window
 )
 
-func setStatus(s *C.char) {
-	C.XStoreName(dpy, root, s)
-	C.XFlush(dpy)
+func setStatus(statusText string) {
+	xproto.ChangeProperty(X, xproto.PropModeReplace, Root, xproto.AtomWmName,
+		xproto.AtomString, 8, uint32(len(statusText)), []byte(statusText))
 }
 
 func mergeFinalString(stringArr []string) string {
@@ -75,6 +71,16 @@ func runBlock(block Block, updateChan chan<- bool) {
 }
 
 func main() {
+	/* setup X */
+	var err error
+
+	X, err = xgb.NewConn()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer X.Close()
+	Root = xproto.Setup(X).DefaultScreen(X).Root
+
 	/* get all the blocks running */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
@@ -107,6 +113,6 @@ func main() {
 
 	/* watch for updates */
 	for _ = range updateChan {
-		setStatus(C.CString(mergeFinalString(barStringArr)))
+		setStatus(mergeFinalString(barStringArr))
 	}
 }
