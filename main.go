@@ -1,5 +1,9 @@
 package main
 
+// #cgo LDFLAGS: -lX11
+// #include <X11/Xlib.h>
+import "C"
+
 import (
 	"bytes"
 	"log"
@@ -23,7 +27,17 @@ var (
 	sigChan      = make(chan os.Signal, len(Blocks))
 	updateChan   = make(chan bool, len(Blocks))
 	barStringArr = make([]string, len(Blocks))
+
+	/* setup X */
+	dpy    = C.XOpenDisplay(nil)
+	screen = C.XDefaultScreen(dpy)
+	root   = C.XRootWindow(dpy, screen)
 )
+
+func setStatus(s *C.char) {
+	C.XStoreName(dpy, root, s)
+	C.XFlush(dpy)
+}
 
 func mergeFinalString(stringArr []string) string {
 	var finalString strings.Builder
@@ -101,7 +115,8 @@ func main() {
 	for i := 0; i < Receivers; i++ {
 		go func() {
 			for _ = range updateChan {
-				exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
+				//exec.Command("xsetroot", "-name", mergeFinalString(barStringArr)).Output()
+				setStatus(C.CString(mergeFinalString(barStringArr)))
 			}
 		}()
 	}
