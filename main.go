@@ -27,11 +27,9 @@ var (
 	sigChan      = make(chan os.Signal, 512)
 	updateChan   = make(chan bool, 512)
 	barStringArr = make([]string, len(Blocks))
-
-	/* setup X */
-	dpy    = C.XOpenDisplay(nil)
-	screen = C.XDefaultScreen(dpy)
-	root   = C.XRootWindow(dpy, screen)
+	dpy          = C.XOpenDisplay(nil)
+	screen       = C.XDefaultScreen(dpy)
+	root         = C.XRootWindow(dpy, screen)
 )
 
 func setStatus(s *C.char) {
@@ -75,7 +73,7 @@ func runBlock(block Block, updateChan chan<- bool) {
 }
 
 func main() {
-	/* get all the blocks running */
+	/* start all the blocks */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
@@ -105,7 +103,7 @@ func main() {
 		}
 	}()
 
-	/* watch for updates */
+	/* set status on update */
 	for _ = range updateChan {
 		setStatus(C.CString(mergeFinalString(barStringArr)))
 	}
