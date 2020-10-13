@@ -1,5 +1,5 @@
 # An extremely simple dwmblocks alternative
-Gocaudices is a dwmblocks alternative written in GO.
+Gocaudices is a dwmblocks alternative written in GO in less than 100 SLOC using [xgb](https://github.com/BurntSushi/xgb).
 
 ## Why?
 Dwmblocks in incredibly poorly written, it gets the job done, but not very well. I wrote this alternative to be simple, fast, and elegant.
