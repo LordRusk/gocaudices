@@ -41,24 +41,12 @@ func mergeFinalString(stringArr []string) string {
 	return finalString.String()
 }
 
-func execBlock(command string) (string, error) {
-	outputBytes, err := exec.Command(Shell, RunIn, command).Output()
-	if err != nil {
-		return "", err
-	}
-
-	outputBytes = bytes.TrimSpace(outputBytes)
-
-	return string(outputBytes), err
-
-}
-
 func runBlock(block Block, updateChan chan<- bool) {
-	newString, err := execBlock(block.Cmd)
+	outputBytes, err := exec.Command(Shell, RunIn, block.Cmd).Output()
 	if err != nil {
-		log.Println("Failed to update", block.Cmd, " -- ", newString, err)
+		log.Println("Failed to update", block.Cmd, " -- ", err)
 	} else {
-		barStringArr[block.Pos] = newString
+		barStringArr[block.Pos] = string(bytes.TrimSpace(outputBytes))
 		updateChan <- true
 	}
 }
