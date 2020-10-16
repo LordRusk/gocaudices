@@ -5,7 +5,7 @@ Gocaudices is a dwmblocks alternative written in GO in less than 100 SLOC using 
 Dwmblocks in incredibly poorly written, it gets the job done, but not very well. I wrote this alternative to be simple, fast, and elegant.
 
 ## How-To
-Gocaudices is configured through editing it's source code. This makes it extremly slim, fast, and secure. Since `main.go` is only ~100 SLOC, it makes it extremely simple to edit and add features.
+Gocaudices is configured through editing it's source code. This makes it extremely slim, fast, and secure. Since `main.go` is only ~100 SLOC, it makes it extremely simple to edit and add features.
 
 - Download
 
@@ -13,7 +13,7 @@ first download gocaudices with `git clone https://github.com/lordrusk/gocaudices
 
 - Configure
 
-Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts or commands, their update intriguers (0 means it will only update on signal), and their update signals. I've left an example of a normal `blocks.go` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm).
+Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts or commands, their update intriguers (0 means it will only update on signal), and their update signals. I've left an example of a normal `blocks.go` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm). NOTE: commands are not run in any shell, rather with `os/exec`. Because of this, commands like `georona | cut -d' ' -f1,3` won't work. Gocaudices does, however, automatically split command and args. So `disk /home` works.
 
 - Update a module
 
@@ -21,7 +21,7 @@ The `Block` definition of `Block { Cmd: "volume", UpInt: 0, UpSig: 10, },` would
 
 ## (Non)-Features
 
-+ Gocaudices automatically trims raw bytes from the end of block outputs on a block by block basis. this keeps the bar looking nice.
++ Gocaudices automatically trims raw bytes from the end of block outputs on a block by block basis. This keeps the bar looking nice.
 
 ## FQA -- Frequently Questioned Answers
 

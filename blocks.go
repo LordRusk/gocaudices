@@ -2,9 +2,7 @@ package main
 
 var (
 	/* config */
-	Delim = " "    /* the delimiter that will be used */
-	Shell = "dash" /* the shell to run the scripts in */
-	RunIn = "-c"   /* arg to make Shell run command from stdin */
+	Delim = " " /* the delimiter that will be used */
 
 	Blocks = []Block{
 		/* command */ /* update interval */ /* update sig */

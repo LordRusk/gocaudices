@@ -16,6 +16,7 @@ import (
 
 type Block struct {
 	Cmd   string
+	Args  []string
 	UpInt int
 	UpSig int
 	Pos   int
@@ -31,7 +32,7 @@ var (
 func mergeFinalString(stringArr []string) string {
 	var finalString strings.Builder
 
-	for i := 0; i < len(stringArr); i++ {
+	for i := 1; i < len(stringArr); i++ {
 		if stringArr[i] != "" {
 			finalString.WriteString(Delim)
 			finalString.WriteString(stringArr[i])
@@ -42,7 +43,7 @@ func mergeFinalString(stringArr []string) string {
 }
 
 func runBlock(block Block, updateChan chan<- bool) {
-	outputBytes, err := exec.Command(Shell, RunIn, block.Cmd).Output()
+	outputBytes, err := exec.Command(block.Cmd, block.Args[:]...).Output()
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, " -- ", err)
 	} else {
@@ -63,6 +64,9 @@ func main() {
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
+			pCmd := strings.Split(Blocks[i].Cmd, " ")
+			Blocks[i].Cmd = pCmd[0]
+			Blocks[i].Args = pCmd[1:]
 			runBlock(Blocks[i], updateChan)
 			if Blocks[i].UpInt != 0 {
 				for {
