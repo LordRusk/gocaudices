@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"strconv"
 	"strings"
 	"syscall"
 	"time"
@@ -23,9 +22,10 @@ type Block struct {
 }
 
 var (
-	sigChan      = make(chan os.Signal, 512)
-	updateChan   = make(chan bool, 512)
+	sigChan      = make(chan os.Signal)
+	updateChan   = make(chan bool)
 	barStringArr = make([]string, len(Blocks))
+	signalMap    = make(map[os.Signal]Block)
 )
 
 func mergeFinalString(stringArr []string) string {
@@ -86,17 +86,14 @@ func main() {
 	}
 
 	/* handle signals */
-	signalMap := make(map[int]Block)
 	for _, block := range Blocks {
 		signal.Notify(sigChan, syscall.Signal(34+block.UpSig))
-		signalMap[34+block.UpSig] = block
+		signalMap[syscall.Signal(34+block.UpSig)] = block
 	}
 
 	go func() {
 		for sig := range sigChan {
-			psig := strings.Split(sig.String(), " ")
-			sigNum, _ := strconv.Atoi(psig[1])
-			block, _ := signalMap[sigNum]
+			block, _ := signalMap[sig]
 			runBlock(block, updateChan)
 		}
 	}()
