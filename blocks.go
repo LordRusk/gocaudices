@@ -29,6 +29,6 @@ var (
 		// Block{Cmd: "vpnstat express", UpSig: 21},
 		Block{Cmd: "internet", UpInt: 5, UpSig: 4},
 		Block{Cmd: "cord", UpSig: 23},
-		// Block{Cmd: "help-icon", UpInt: 0, UpSig: 20},
+		// Block{Cmd: "help-icon"},
 	}
 )
