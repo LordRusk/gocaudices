@@ -45,7 +45,7 @@ func mergeFinalString(stringArr []string) string {
 func runBlock(block Block, updateChan chan<- bool) {
 	outputBytes, err := exec.Command(block.Cmd, block.Args[:]...).Output()
 	if err != nil {
-		log.Println("Failed to update", block.Cmd, " -- ", err)
+		log.Println("Failed to update", block.Cmd, block.Args[:], " -- ", err)
 	} else {
 		barStringArr[block.Pos] = string(bytes.TrimSpace(outputBytes))
 		updateChan <- true
@@ -60,13 +60,17 @@ func main() {
 	defer x.Close()
 	root := xproto.Setup(x).DefaultScreen(x).Root
 
-	/* run blocks */
+	/* initialize blocks */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
-			pCmd := strings.Split(Blocks[i].Cmd, " ")
-			Blocks[i].Cmd = pCmd[0]
-			Blocks[i].Args = pCmd[1:]
+
+			if len(Blocks[i].Args) < 1 {
+				pCmd := strings.Split(Blocks[i].Cmd, " ")
+				Blocks[i].Cmd = pCmd[0]
+				Blocks[i].Args = pCmd[1:]
+			}
+
 			runBlock(Blocks[i], updateChan)
 			if Blocks[i].UpInt != 0 {
 				for {
@@ -79,8 +83,10 @@ func main() {
 
 	/* handle signals */
 	for _, block := range Blocks {
-		signal.Notify(sigChan, syscall.Signal(34+block.UpSig))
-		signalMap[syscall.Signal(34+block.UpSig)] = block
+		if block.UpSig != 0 {
+			signal.Notify(sigChan, syscall.Signal(34+block.UpSig))
+			signalMap[syscall.Signal(34+block.UpSig)] = block
+		}
 	}
 
 	go func() {

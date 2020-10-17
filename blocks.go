@@ -6,11 +6,11 @@ var (
 
 	Blocks = []Block{
 		/* command */ /* update interval */ /* update sig */
-		Block{Cmd: "recicon", UpInt: 0, UpSig: 9},
-		// Block{Cmd: "music", UpInt: 0, UpSig: 11},
-		Block{Cmd: "pacpackages", UpInt: 0, UpSig: 8},
-		Block{Cmd: "news", UpInt: 0, UpSig: 6},
-		Block{Cmd: "georona", UpInt: 0, UpSig: 19},
+		Block{Cmd: "recicon", UpSig: 9},
+		// Block{Cmd: "music", UpSig: 11},
+		Block{Cmd: "pacpackages", UpSig: 8},
+		Block{Cmd: "news", UpSig: 6},
+		Block{Cmd: "dash", Args: []string{"-c", "georona | cut -d' ' -f1,3"}, UpInt: 18000, UpSig: 19}, /* example of command that is run in shell */
 		// Block{Cmd: "crypto", UpInt: 18000, UpSig: 17},
 		Block{Cmd: "torrent", UpInt: 20, UpSig: 7},
 		Block{Cmd: "memory", UpInt: 6, UpSig: 14},
@@ -20,15 +20,15 @@ var (
 		Block{Cmd: "disk", UpInt: 10, UpSig: 15},
 		Block{Cmd: "astrological", UpInt: 18000, UpSig: 18},
 		Block{Cmd: "weather", UpInt: 18000, UpSig: 5},
-		Block{Cmd: "mailbox", UpInt: 0, UpSig: 12},
+		Block{Cmd: "mailbox", UpSig: 12},
 		Block{Cmd: "nettraf", UpInt: 1, UpSig: 16},
-		Block{Cmd: "volume", UpInt: 0, UpSig: 10},
+		Block{Cmd: "volume", UpSig: 10},
 		Block{Cmd: "battery", UpInt: 5, UpSig: 3},
-		Block{Cmd: "clock", UpInt: 0, UpSig: 1},
+		Block{Cmd: "clock", UpSig: 1},
 		// Block{Cmd: "sip", UpInt: 10, UpSig: 2},
-		// Block{Cmd: "vpnstat express", UpInt: 0, UpSig: 21},
+		// Block{Cmd: "vpnstat express", UpSig: 21},
 		Block{Cmd: "internet", UpInt: 5, UpSig: 4},
-		Block{Cmd: "cord", UpInt: 0, UpSig: 23},
+		Block{Cmd: "cord", UpSig: 23},
 		// Block{Cmd: "help-icon", UpInt: 0, UpSig: 20},
 	}
 )
