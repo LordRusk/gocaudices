@@ -17,7 +17,7 @@ Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Ad
 
 - Shell commands
 
-Commands are not run in any shell, rather with `os/exec`. Because of this, a `block` defined as `Block{Cmd: "georona | cut -d' ' -f1,3"}, UpInt: 0, UpSig: 19},` will not work. If you want to run a shell command, something like this `Block{Cmd: "dash", Args: []string{"-c", "georona | cut -d' ' -f1,3"}, UpInt: 0, UpSig: 19},` will work.
+Commands are not run in any shell, rather with `os/exec`. Because of this, a `block` defined as `Block{Cmd: "georona | cut -d' ' -f1,3"}, UpSig: 19},` will not work. If you want to run a shell command, something like this `Block{Cmd: "dash", Args: []string{"-c", "georona | cut -d' ' -f1,3"}, UpSig: 19},` will work.
 
 - Update a module
 
