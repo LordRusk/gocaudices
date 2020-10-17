@@ -21,7 +21,7 @@ Commands are not run in any shell, rather with `os/exec`. Because of this, a `bl
 
 - Update a module
 
-The `Block` definition of `Block{Cmd: "volume", UpInt: 0, UpSig: 10},` would be updated like `kill -$((34+10)) $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof gocaudices)") },`.
+The `Block` definition of `Block{Cmd: "volume", UpSig: 10},` would be updated like `kill -$((34+10)) $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof gocaudices)") },`.
 
 - Deeper explanation.
 
