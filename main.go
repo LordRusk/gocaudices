@@ -29,7 +29,7 @@ var (
 	signalMap    = make(map[os.Signal]Block)
 )
 
-func mergeFinalString(stringArr []string) string {
+func updateBar(x *xgb.Conn, root xproto.Window, stringArr []string) {
 	var finalString strings.Builder
 
 	for i := 1; i < len(stringArr); i++ {
@@ -39,7 +39,7 @@ func mergeFinalString(stringArr []string) string {
 		}
 	}
 
-	return finalString.String()
+	xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(finalString.Len()), []byte(finalString.String()))
 }
 
 func runBlock(block Block, updateChan chan<- bool) {
@@ -53,6 +53,7 @@ func runBlock(block Block, updateChan chan<- bool) {
 }
 
 func main() {
+	/* setup X */
 	x, err := xgb.NewConn()
 	if err != nil {
 		log.Fatal(err)
@@ -98,7 +99,6 @@ func main() {
 
 	/* set status on update */
 	for _ = range updateChan {
-		statusText := mergeFinalString(barStringArr)
-		xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(statusText)), []byte(statusText))
+		updateBar(x, root, barStringArr)
 	}
 }
