@@ -32,7 +32,7 @@ var (
 func updateBar(x *xgb.Conn, root xproto.Window, stringArr []string) {
 	var finalString strings.Builder
 
-	for i := 0; i < len(stringArr)-1; i++ {
+	for i := 0; i < len(stringArr); i++ {
 		if stringArr[i] != "" {
 			finalString.WriteString(Delim)
 			finalString.WriteString(stringArr[i])
