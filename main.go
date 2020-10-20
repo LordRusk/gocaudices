@@ -24,7 +24,7 @@ type Block struct {
 
 var (
 	sigChan      = make(chan os.Signal)
-	updateChan   = make(chan bool)
+	updateChan   = make(chan int)
 	barStringArr = make([]string, len(Blocks))
 	signalMap    = make(map[os.Signal]Block)
 )
@@ -42,13 +42,13 @@ func updateBar(x *xgb.Conn, root xproto.Window, stringArr []string) {
 	xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(finalString.Len()), []byte(finalString.String()))
 }
 
-func runBlock(block Block, updateChan chan<- bool) {
+func runBlock(block Block, updateChan chan<- int) {
 	outputBytes, err := exec.Command(block.Cmd, block.Args[:]...).Output()
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, block.Args[:], " -- ", err)
 	} else {
 		barStringArr[block.Pos] = string(bytes.TrimSpace(outputBytes))
-		updateChan <- true
+		updateChan <- 0
 	}
 }
 
