@@ -2,7 +2,7 @@ package main
 
 var (
 	/* config */
-	Delim = " " /* the delimiter that will be used */
+	Delim = []byte(" ") /* the delimiter that will be used */
 
 	Blocks = []Block{
 		/* command */ /* update interval */ /* update sig */

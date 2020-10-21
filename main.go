@@ -23,33 +23,34 @@ type Block struct {
 }
 
 var (
-	sigChan      = make(chan os.Signal)
-	updateChan   = make(chan int)
-	barStringArr = make([]string, len(Blocks))
-	signalMap    = make(map[os.Signal]Block)
-	x            *xgb.Conn
-	root         xproto.Window
+	sigChan     = make(chan os.Signal)
+	signalMap   = make(map[os.Signal]Block)
+	updateChan  = make(chan int)
+	barBytesArr = make([][]byte, len(Blocks))
+	x           *xgb.Conn
+	root        xproto.Window
 )
 
-func updateBar(stringArr []string) {
-	var finalString strings.Builder
+func updateBar() {
+	var finalBytesBuffer bytes.Buffer
 
-	for i := 0; i < len(stringArr); i++ {
-		if stringArr[i] != "" {
-			finalString.WriteString(Delim)
-			finalString.WriteString(stringArr[i])
+	for i := 0; i < len(barBytesArr); i++ {
+		if barBytesArr[i] != nil {
+			finalBytesBuffer.Write(Delim)
+			finalBytesBuffer.Write(barBytesArr[i])
 		}
 	}
 
-	xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(finalString.Len()), []byte(finalString.String()))
+	finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), Delim)
+	xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes)
 }
 
-func runBlock(block Block, updateChan chan<- int) {
+func runBlock(block Block) {
 	outputBytes, err := exec.Command(block.Cmd, block.Args[:]...).Output()
 	if err != nil {
 		log.Println("Failed to update", block.Cmd, block.Args[:], " -- ", err)
 	} else {
-		barStringArr[block.Pos] = string(bytes.TrimSpace(outputBytes))
+		barBytesArr[block.Pos] = bytes.TrimSpace(outputBytes)
 		updateChan <- 0
 	}
 }
@@ -76,11 +77,11 @@ func main() {
 				Blocks[i].Args = pCmd[1:]
 			}
 
-			runBlock(Blocks[i], updateChan)
+			runBlock(Blocks[i])
 			if Blocks[i].UpInt != 0 {
 				for {
 					time.Sleep(time.Duration(Blocks[i].UpInt) * time.Second)
-					runBlock(Blocks[i], updateChan)
+					runBlock(Blocks[i])
 				}
 			}
 		}(i)
@@ -97,12 +98,12 @@ func main() {
 	go func() {
 		for sig := range sigChan {
 			block, _ := signalMap[sig]
-			runBlock(block, updateChan)
+			runBlock(block)
 		}
 	}()
 
 	/* set status on update */
 	for _ = range updateChan {
-		updateBar(barStringArr)
+		updateBar()
 	}
 }
