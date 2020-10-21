@@ -27,9 +27,11 @@ var (
 	updateChan   = make(chan int)
 	barStringArr = make([]string, len(Blocks))
 	signalMap    = make(map[os.Signal]Block)
+	x            *xgb.Conn
+	root         xproto.Window
 )
 
-func updateBar(x *xgb.Conn, root xproto.Window, stringArr []string) {
+func updateBar(stringArr []string) {
 	var finalString strings.Builder
 
 	for i := 0; i < len(stringArr); i++ {
@@ -54,12 +56,14 @@ func runBlock(block Block, updateChan chan<- int) {
 
 func main() {
 	/* setup X */
-	x, err := xgb.NewConn()
+	var err error
+
+	x, err = xgb.NewConn()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer x.Close()
-	root := xproto.Setup(x).DefaultScreen(x).Root
+	root = xproto.Setup(x).DefaultScreen(x).Root
 
 	/* initialize blocks */
 	for i := 0; i < len(Blocks); i++ {
@@ -99,6 +103,6 @@ func main() {
 
 	/* set status on update */
 	for _ = range updateChan {
-		updateBar(x, root, barStringArr)
+		updateBar(barStringArr)
 	}
 }
