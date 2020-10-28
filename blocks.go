@@ -5,7 +5,6 @@ var (
 	Delim = []byte(" ") /* the delimiter that will be used */
 
 	Blocks = []Block{
-		/* command */ /* update interval */ /* update sig */
 		Block{Cmd: "recicon", UpSig: 9},
 		Block{Cmd: "music", UpSig: 11},
 		Block{Cmd: "pacpackages", UpSig: 8},
