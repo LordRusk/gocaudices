@@ -102,13 +102,8 @@ func main() {
 		}
 	}
 
-	go func() {
-		for sig := range sigChan {
-			block, _ := signalMap[sig]
-			runBlock(block)
-		}
-	}()
-
-	/* block */
-	select {}
+	for sig := range sigChan {
+		block, _ := signalMap[sig]
+		runBlock(block)
+	}
 }
