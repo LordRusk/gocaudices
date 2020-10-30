@@ -66,6 +66,13 @@ func main() {
 	defer x.Close()
 	root = xproto.Setup(x).DefaultScreen(x).Root
 
+	/* set status on update */
+	go func() {
+		for _ = range updateChan {
+			updateBar()
+		}
+	}()
+
 	/* initialize blocks */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
@@ -102,8 +109,6 @@ func main() {
 		}
 	}()
 
-	/* set status on update */
-	for _ = range updateChan {
-		updateBar()
-	}
+	/* block */
+	select {}
 }
