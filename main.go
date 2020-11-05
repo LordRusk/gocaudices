@@ -26,7 +26,7 @@ var (
 	sigChan     = make(chan os.Signal, 1)
 	signalMap   = make(map[os.Signal]Block)
 	updateChan  = make(chan int, 1)
-	barBytesArr = make([][]byte, len(Blocks))
+	barBytesArr = [30][]byte{}
 	x           *xgb.Conn
 	root        xproto.Window
 )
