@@ -26,7 +26,7 @@ var (
 	sigChan     = make(chan os.Signal, 1)
 	signalMap   = make(map[os.Signal]Block)
 	updateChan  = make(chan int, 1)
-	barBytesArr = [30][]byte{}
+	barBytesArr = make([][]byte, len(Blocks))
 	x           *xgb.Conn
 	root        xproto.Window
 )
@@ -34,7 +34,7 @@ var (
 func updateBar() {
 	var finalBytesBuffer bytes.Buffer
 
-	for i := 0; i < len(barBytesArr); i++ {
+	for i := 0; i < len(Blocks); i++ {
 		if barBytesArr[i] != nil {
 			finalBytesBuffer.Write(Delim)
 			finalBytesBuffer.Write(barBytesArr[i])
