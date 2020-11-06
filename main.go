@@ -23,9 +23,9 @@ type Block struct {
 }
 
 var (
-	sigChan     = make(chan os.Signal, 1)
+	sigChan     = make(chan os.Signal)
 	signalMap   = make(map[os.Signal]Block)
-	updateChan  = make(chan int, 1)
+	updateChan  = make(chan int)
 	barBytesArr = make([][]byte, len(Blocks))
 	x           *xgb.Conn
 	root        xproto.Window
@@ -66,13 +66,6 @@ func main() {
 	defer x.Close()
 	root = xproto.Setup(x).DefaultScreen(x).Root
 
-	/* set status on update */
-	go func() {
-		for _ = range updateChan {
-			updateBar()
-		}
-	}()
-
 	/* initialize blocks */
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
@@ -102,8 +95,20 @@ func main() {
 		}
 	}
 
-	for sig := range sigChan {
-		block, _ := signalMap[sig]
-		runBlock(block)
-	}
+	go func() {
+		for sig := range sigChan {
+			block, _ := signalMap[sig]
+			runBlock(block)
+		}
+	}()
+
+	/* check for updates */
+	go func() {
+		for _ = range updateChan {
+			updateBar()
+		}
+	}()
+
+	/* block */
+	select {}
 }
