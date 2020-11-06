@@ -103,12 +103,7 @@ func main() {
 	}()
 
 	/* check for updates */
-	go func() {
-		for _ = range updateChan {
-			updateBar()
-		}
-	}()
-
-	/* block */
-	select {}
+	for _ = range updateChan {
+		updateBar()
+	}
 }
