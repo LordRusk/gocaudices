@@ -23,10 +23,11 @@ type Block struct {
 }
 
 var (
-	sigChan     = make(chan os.Signal)
-	signalMap   = make(map[os.Signal]Block)
-	updateChan  = make(chan int)
+	updateChan  = make(chan struct{})
 	barBytesArr = make([][]byte, len(Blocks))
+	sigChan     = make(chan os.Signal, 16)
+	signalMap   = make(map[os.Signal]Block)
+	signalArr   = []os.Signal{}
 	x           *xgb.Conn
 	root        xproto.Window
 )
@@ -51,7 +52,7 @@ func runBlock(block Block) {
 		log.Println("Failed to update", block.Cmd, block.Args[:], " -- ", err)
 	} else {
 		barBytesArr[block.Pos] = bytes.TrimSpace(outputBytes)
-		updateChan <- 0
+		updateChan <- struct{}{}
 	}
 }
 
