@@ -51,9 +51,7 @@ func runBlock(block Block) {
 		log.Println("Failed to update", block.Cmd, block.Args[:], " -- ", err)
 	} else {
 		barBytesArr[block.Pos] = bytes.TrimSpace(outputBytes)
-		if len(updateChan) < 1 {
-			updateChan <- nil
-		}
+		updateChan <- nil
 	}
 }
 
