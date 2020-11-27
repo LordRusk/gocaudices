@@ -27,8 +27,8 @@ var (
 	barBytesArr = make([][]byte, len(Blocks))
 	sigChan     = make(chan os.Signal, 16)
 	signalMap   = make(map[os.Signal]Block)
-	x           *xgb.Conn
-	root        xproto.Window
+	x           *xgb.Conn     // global X connection
+	root        xproto.Window // global root window
 )
 
 func updateBar() {
@@ -56,7 +56,7 @@ func runBlock(block Block) {
 }
 
 func main() {
-	/* setup X */
+	// setup X
 	var err error
 
 	x, err = xgb.NewConn()
