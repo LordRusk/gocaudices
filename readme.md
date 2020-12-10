@@ -21,18 +21,12 @@ Commands are not run in any shell, rather with `os/exec`. Because of this, a `bl
 
 - Update a module
 
-The `Block` definition of `Block{Cmd: "volume", UpSig: 10},` would be updated like `kill -$((34+10)) $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -$((34+10)) $(pidof gocaudices)") },`.
-
-- Deeper explanation.
-
-The `block` struct has 5 fields, `Cmd string`, `Args []string`, `UpInt int`, `UpSig int`, and `Pos int`. `Cmd` defines the command, which internally is split into an array of strings, `Cmd` is redefined as the first item in this array, and `Args` gets what's left over. The reason for doing this is so commands like `disk /home` will be properly ran, while keeping the `blocks.go` from looking ugly. If `Arg` is defined in `block` than it won't do the previous process and handle running it just as defined. This can be used, as shown above, to run shell commands. `UpInt` and `UpSig` are integral parts of gocaudices. `UpInt` sets the update intigure. If this value isn't 0 when initializing all the blocks, it will start a loop where every `time.Duration(UpInt) * time.Second` it will update the `block`. `UpSig` sets the update signal + 34. If the value is 0, it won't be externally updatable. The way gocaudices keeps track of block output is with a slice with length of `len(Blocks)`. `Pos` is used to keep track of where in the array the new output text should go. `Pos` should never be defined in the `Blocks.go` file. Even if it is, it will be redefined when all the blocks get initialized.
+Note that multiple blocks can have the same update signal. The `Block` definition of `Block{Cmd: "volume", UpSig: 10},` would be updated like `kill -44 $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -44 $(pidof gocaudices)") },`.
 
 ## (Non)-Features
-
 + Gocaudices automatically trims raw bytes from the end of block outputs on a block by block basis. This keeps the bar looking nice.
 
 ## FQA -- Frequently Questioned Answers
-
 + Does it have bar click-ability?
 
-	• Not right now, after I work out a few kinks I'll write a patch that will be compatible with the patch already on suckless.org for bar click-ablity.
+	• No, but if you'd like to add that feature or create a patch, create a pull request!

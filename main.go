@@ -25,8 +25,8 @@ type Block struct {
 var (
 	updateChan  = make(chan interface{}, 1)
 	barBytesArr = make([][]byte, len(Blocks))
-	sigChan     = make(chan os.Signal, 16)
-	signalMap   = make(map[os.Signal]Block)
+	sigChan     = make(chan os.Signal, 1024)
+	signalMap   = make(map[os.Signal][]Block)
 	x           *xgb.Conn     // global X connection
 	root        xproto.Window // global root window
 )
@@ -66,7 +66,7 @@ func main() {
 	defer x.Close()
 	root = xproto.Setup(x).DefaultScreen(x).Root
 
-	/* initialize blocks */
+	// initialize blocks
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
 			Blocks[i].Pos = i
@@ -87,22 +87,24 @@ func main() {
 		}(i)
 	}
 
-	/* handle signals */
+	// handle signals
 	for _, block := range Blocks {
 		if block.UpSig != 0 {
 			signal.Notify(sigChan, syscall.Signal(34+block.UpSig))
-			signalMap[syscall.Signal(34+block.UpSig)] = block
+			signalMap[syscall.Signal(34+block.UpSig)] = append(signalMap[syscall.Signal(34+block.UpSig)], block)
 		}
 	}
 
 	go func() {
 		for sig := range sigChan {
-			block, _ := signalMap[sig]
-			runBlock(block)
+			blocks, _ := signalMap[sig]
+			for _, block := range blocks {
+				runBlock(block)
+			}
 		}
 	}()
 
-	/* check for updates */
+	// check for updates
 	for _ = range updateChan {
 		updateBar()
 	}
