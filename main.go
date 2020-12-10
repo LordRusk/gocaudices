@@ -31,24 +31,10 @@ var (
 	root        xproto.Window // global root window
 )
 
-func updateBar() {
-	var finalBytesBuffer bytes.Buffer
-
-	for i := 0; i < len(Blocks); i++ {
-		if barBytesArr[i] != nil {
-			finalBytesBuffer.Write(Delim)
-			finalBytesBuffer.Write(barBytesArr[i])
-		}
-	}
-
-	finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), Delim)
-	xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes)
-}
-
 func runBlock(block Block) {
 	outputBytes, err := exec.Command(block.Cmd, block.Args[:]...).Output()
 	if err != nil {
-		log.Println("Failed to update", block.Cmd, block.Args[:], " -- ", err)
+		log.Printf("Failed to update %v %v | %v", block.Cmd, block.Args[:], err)
 	} else {
 		barBytesArr[block.Pos] = bytes.TrimSpace(outputBytes)
 		updateChan <- nil
@@ -104,8 +90,19 @@ func main() {
 		}
 	}()
 
-	// check for updates
+	var finalBytesBuffer bytes.Buffer
 	for _ = range updateChan {
-		updateBar()
+		for i := 0; i < len(Blocks); i++ {
+			if barBytesArr[i] != nil {
+				finalBytesBuffer.Write(Delim)
+				finalBytesBuffer.Write(barBytesArr[i])
+			}
+		}
+
+		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), Delim)
+		finalBytesBuffer.Reset()
+
+		// set new root window name
+		xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes)
 	}
 }
