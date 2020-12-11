@@ -13,11 +13,11 @@ First download gocaudices with `git clone https://github.com/lordrusk/gocaudices
 
 - Configure
 
-Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add individual scripts or commands, their update intriguers (undefined or 0 value = only update on signal), and their update signals (undefined or 0 value = no update signal). I've left an example of a normal `blocks.go` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm).
+Gocaudices can be configured through adding `Blocks` in the `blocks.go` file. Add their command, their update intriguers, and their update signals. I've left an example of a normal `blocks.go` config file that works with [my dotfiles](https://github.com/lordrusk/artixdwm).
 
 - Shell commands
 
-Commands are not run in any shell, rather with `os/exec`. Because of this, a `block` defined as `Block{Cmd: "georona | cut -d' ' -f1,3"}, UpSig: 19},` will not work. If you want to run a shell command, something like this `Block{Cmd: "dash", Args: []string{"-c", "georona | cut -d' ' -f1,3"}, UpSig: 19},` will work.
+To run shell commands, add `inSh: true,` to the block in `blocks.go`. You can also set the shell in `blocks.go`.
 
 - Update a module
 

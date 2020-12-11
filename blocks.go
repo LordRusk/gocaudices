@@ -2,29 +2,29 @@ package main
 
 var (
 	/* config */
-	Delim = []byte(" ") // the delimiter that will be used
+	delim = []byte(" ") // the delimiter that will be used
+	shell = "sh"
 
 	Blocks = []Block{
-		Block{Cmd: "recicon", UpSig: 9},
-		Block{Cmd: "music", UpSig: 11},
-		Block{Cmd: "pacpackages", UpSig: 8},
-		Block{Cmd: "news", UpSig: 6},
-		Block{Cmd: "dash", Args: []string{"-c", "georona | cut -d' ' -f1,3"}, UpInt: 18000, UpSig: 19}, // example of command that is run in shell
-		Block{Cmd: "torrent", UpInt: 10, UpSig: 7},
-		Block{Cmd: "memory", UpInt: 6, UpSig: 14},
-		Block{Cmd: "cpu", UpInt: 3, UpSig: 13},
-		Block{Cmd: "cpubars", UpInt: 1, UpSig: 22},
-		Block{Cmd: "disk /home", UpInt: 7, UpSig: 15},
-		Block{Cmd: "disk", UpInt: 7, UpSig: 15},
-		Block{Cmd: "astrological", UpInt: 18000, UpSig: 18},
-		Block{Cmd: "weather", UpInt: 18000, UpSig: 5},
-		Block{Cmd: "mailbox", UpSig: 12},
-		Block{Cmd: "nettraf", UpInt: 1, UpSig: 16},
-		Block{Cmd: "volume", UpSig: 10},
-		Block{Cmd: "battery", UpInt: 5, UpSig: 3},
-		Block{Cmd: "clock", UpSig: 1},
-		Block{Cmd: "sip", UpInt: 10, UpSig: 2},
-		Block{Cmd: "internet", UpInt: 5, UpSig: 4},
-		Block{Cmd: "help-icon"},
+		Block{cmd: "recicon", upSig: 9},
+		Block{cmd: "music", upSig: 11},
+		Block{cmd: "pacpackages", upSig: 8},
+		Block{cmd: "news", upSig: 6},
+		Block{cmd: "georona | cut -d' ' -f1,3", inSh: true, upInt: 18000, upSig: 19}, // example of command that is run in shell
+		Block{cmd: "torrent", upInt: 10, upSig: 7},
+		Block{cmd: "memory", upInt: 6, upSig: 14},
+		Block{cmd: "cpu", upInt: 3, upSig: 13},
+		Block{cmd: "cpubars", upInt: 1, upSig: 22},
+		Block{cmd: "disk /home", upInt: 7, upSig: 15},
+		Block{cmd: "disk", upInt: 7, upSig: 15},
+		Block{cmd: "astrological", upInt: 18000, upSig: 18},
+		Block{cmd: "weather", upInt: 18000, upSig: 5},
+		Block{cmd: "mailbox", upSig: 12},
+		Block{cmd: "nettraf", upInt: 1, upSig: 16},
+		Block{cmd: "volume", upSig: 10},
+		Block{cmd: "battery", upInt: 5, upSig: 3},
+		Block{cmd: "clock", upSig: 1},
+		Block{cmd: "sip", upInt: 10, upSig: 2},
+		Block{cmd: "internet", upInt: 5, upSig: 4},
 	}
 )

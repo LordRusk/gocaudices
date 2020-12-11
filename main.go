@@ -15,11 +15,12 @@ import (
 )
 
 type Block struct {
-	Cmd   string
-	Args  []string
-	UpInt int
-	UpSig int
-	Pos   int
+	cmd   string
+	inSh  bool
+	args  []string // used internally
+	upInt int
+	upSig int
+	pos   int
 }
 
 var (
@@ -32,11 +33,11 @@ var (
 )
 
 func runBlock(block Block) {
-	outputBytes, err := exec.Command(block.Cmd, block.Args[:]...).Output()
+	outputBytes, err := exec.Command(block.args[0], block.args[1:]...).Output()
 	if err != nil {
-		log.Printf("Failed to update %v %v | %v", block.Cmd, block.Args[:], err)
+		log.Printf("Failed to update `%v` | %v", block.cmd, err)
 	} else {
-		barBytesArr[block.Pos] = bytes.TrimSpace(outputBytes)
+		barBytesArr[block.pos] = bytes.TrimSpace(outputBytes)
 		updateChan <- nil
 	}
 }
@@ -44,7 +45,6 @@ func runBlock(block Block) {
 func main() {
 	// setup X
 	var err error
-
 	x, err = xgb.NewConn()
 	if err != nil {
 		log.Fatal(err)
@@ -55,18 +55,18 @@ func main() {
 	// initialize blocks
 	for i := 0; i < len(Blocks); i++ {
 		go func(i int) {
-			Blocks[i].Pos = i
+			Blocks[i].pos = i
 
-			if len(Blocks[i].Args) < 1 {
-				pCmd := strings.Split(Blocks[i].Cmd, " ")
-				Blocks[i].Cmd = pCmd[0]
-				Blocks[i].Args = pCmd[1:]
+			if Blocks[i].inSh {
+				Blocks[i].args = []string{shell, "-c", Blocks[i].cmd}
+			} else {
+				Blocks[i].args = strings.Split(Blocks[i].cmd, " ")
 			}
 
 			runBlock(Blocks[i])
-			if Blocks[i].UpInt != 0 {
+			if Blocks[i].upInt != 0 {
 				for {
-					time.Sleep(time.Duration(Blocks[i].UpInt) * time.Second)
+					time.Sleep(time.Duration(Blocks[i].upInt) * time.Second)
 					runBlock(Blocks[i])
 				}
 			}
@@ -75,9 +75,9 @@ func main() {
 
 	// handle signals
 	for _, block := range Blocks {
-		if block.UpSig != 0 {
-			signal.Notify(sigChan, syscall.Signal(34+block.UpSig))
-			signalMap[syscall.Signal(34+block.UpSig)] = append(signalMap[syscall.Signal(34+block.UpSig)], block)
+		if block.upSig != 0 {
+			signal.Notify(sigChan, syscall.Signal(34+block.upSig))
+			signalMap[syscall.Signal(34+block.upSig)] = append(signalMap[syscall.Signal(34+block.upSig)], block)
 		}
 	}
 
@@ -94,12 +94,12 @@ func main() {
 	for _ = range updateChan {
 		for i := 0; i < len(Blocks); i++ {
 			if barBytesArr[i] != nil {
-				finalBytesBuffer.Write(Delim)
+				finalBytesBuffer.Write(delim)
 				finalBytesBuffer.Write(barBytesArr[i])
 			}
 		}
 
-		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), Delim)
+		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
 		finalBytesBuffer.Reset()
 
 		// set new root window name
