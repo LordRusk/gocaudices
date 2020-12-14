@@ -32,3 +32,6 @@ The `Block` definition of `Block{Cmd: "volume", UpSig: 10},` would be updated li
 + Does it have bar click-ability?
 
 	• No, but if you'd like to add that feature or create a patch, create a pull request!
+
+## License
+Gocaudices, along with all software created by me, is in the public domain, as all software should be.
