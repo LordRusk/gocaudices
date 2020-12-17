@@ -60,7 +60,7 @@ func main() {
 			if Blocks[i].inSh {
 				Blocks[i].args = []string{shell, "-c", Blocks[i].cmd}
 			} else {
-				Blocks[i].args = append(strings.Split(Blocks[i].cmd, " "), "")
+				Blocks[i].args = strings.Split(Blocks[i].cmd, " ")
 			}
 
 			runBlock(Blocks[i])
