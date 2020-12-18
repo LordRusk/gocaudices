@@ -1,8 +1,8 @@
 # An extremely simple dwmblocks alternative
 Gocaudices is a dwmblocks alternative written in GO in less than 100 SLOC using [xgb](https://github.com/BurntSushi/xgb).
 
-## Why?
-Dwmblocks in incredibly poorly written, it gets the job done, but not very well. I wrote this alternative to be simple, fast, and elegant. This project is never meant to exceed 100 SLOC in the base build.
+## About
+I wrote this alternative to be simple, fast, and elegant. This project is never meant to exceed 100 SLOC in the base build.
 
 ## How-To
 Gocaudices is configured through editing it's source code. This makes it extremely slim, fast, and secure. Since `main.go` is only ~100 SLOC, it makes it extremely simple to edit and add features.
