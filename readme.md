@@ -9,7 +9,7 @@ Gocaudices is configured through editing it's source code. This makes it extreme
 
 - How To
 
-First download gocaudices with: ```git clone https://github.com/lordrusk/gocaudices``` You can (re)compile with: ```go install```
+First download gocaudices with: `git clone https://github.com/lordrusk/gocaudices` You can (re)compile with: `go install`
 
 - Configure
 
