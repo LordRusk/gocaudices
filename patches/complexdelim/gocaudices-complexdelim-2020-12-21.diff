@@ -19,9 +19,9 @@ index 2aa3234..d3ea89a 100644
 -	delim = []byte(" ") // the delimiter that will be used
 -	shell = "sh"      // shell used
 +	delim = [3][]byte{ // the delimiter that will be used
-+		{'['},
-+		[]byte("] ["),
-+		{']'},
++		{'['}, // bytes on the left side
++		[]byte("] ["), // bytes inbetween blocks
++		{']'}, // bytes on the right side
 +	}
 +	shell = "sh" // shell used
 
