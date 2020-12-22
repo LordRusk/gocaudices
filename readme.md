@@ -33,6 +33,3 @@ There will soon be many patches to gocaudices to make it compatable with many [p
 + Does it have bar click-ability?
 
 	• No, but if you'd like to create a patch, create a pull request!
-
-## License
-Gocaudices, along with all software created by me, is in the public domain, as all software should be.
