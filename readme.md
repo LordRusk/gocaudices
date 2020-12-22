@@ -23,13 +23,16 @@ To run shell commands, add `inSh: true,` to the block in `blocks.go`. You can al
 
 The `Block` definition of `{cmd: "volume", upSig: 10},` would be updated like `kill -44 $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -44 $(pidof gocaudices)") },`.
 
+## Patches
+Gocaudices is very patchable, and patches are hosted in this repo in `patches/*patch*`. A example patch I created is `complexdelim`. You would apply this patch with `patch -p1 < path/to/patch.diff`. To create a proper patch, refer to [hacking](https://suckless.org/hacking/).
+
 ## (Non)-Features
 + Multiple blocks can have the same update signal.
 
 ## FQA -- Frequently Questioned Answers
 + Does it have bar click-ability?
 
-	• No, but if you'd like to add that feature or create a patch, create a pull request!
+	• No, but if you'd like to create a patch, create a pull request!
 
 ## License
 Gocaudices, along with all software created by me, is in the public domain, as all software should be.

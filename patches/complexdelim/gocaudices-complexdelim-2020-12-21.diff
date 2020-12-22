@@ -1,0 +1,52 @@
+From f481a5812e8e021e97e120f74dfaf6984ad56b66 Mon Sep 17 00:00:00 2001
+From: rusk <lordruskk@gmail.com>
+Date: Mon, 21 Dec 2020 19:26:23 -0800
+Subject: [PATCH] Add ability for complex delimiters
+
+---
+ blocks.go | 8 ++++++--
+ main.go   | 5 +++--
+ 2 files changed, 9 insertions(+), 4 deletions(-)
+
+diff --git a/blocks.go b/blocks.go
+index 2aa3234..d3ea89a 100644
+--- a/blocks.go
++++ b/blocks.go
+@@ -1,8 +1,12 @@
+ package main
+ 
+ var (
+-	delim = []byte(" ") // the delimiter that will be used
+-	shell = "dash"      // shell used
++	delim = [3][]byte{ // the delimiter that will be used
++		{'['},
++		[]byte("] ["),
++		{']'},
++	}
++	shell = "dash" // shell used
+ 
+ 	Blocks = []Block{
+ 		{cmd: "recicon", upSig: 9},
+diff --git a/main.go b/main.go
+index 0fd8f93..98db181 100644
+--- a/main.go
++++ b/main.go
+@@ -98,12 +98,13 @@ func main() {
+ 	for range updateChan { // update bar on signal
+ 		for i := 0; i < len(Blocks); i++ {
+ 			if barBytesArr[i] != nil {
+-				finalBytesBuffer.Write(delim)
++				finalBytesBuffer.Write(delim[1])
+ 				finalBytesBuffer.Write(barBytesArr[i])
+ 			}
+ 		}
++		finalBytesBuffer.Write(delim[2])
+ 
+-		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
++		finalBytes := append(delim[0], bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim[1])[:]...)
+ 		finalBytesBuffer.Reset()
+ 
+ 		// set the root window name
+-- 
+2.29.2
+
