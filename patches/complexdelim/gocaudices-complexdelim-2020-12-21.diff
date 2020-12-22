@@ -14,17 +14,17 @@ index 2aa3234..d3ea89a 100644
 +++ b/blocks.go
 @@ -1,8 +1,12 @@
  package main
- 
+
  var (
 -	delim = []byte(" ") // the delimiter that will be used
--	shell = "dash"      // shell used
+-	shell = "sh"      // shell used
 +	delim = [3][]byte{ // the delimiter that will be used
 +		{'['},
 +		[]byte("] ["),
 +		{']'},
 +	}
-+	shell = "dash" // shell used
- 
++	shell = "sh" // shell used
+
  	Blocks = []Block{
  		{cmd: "recicon", upSig: 9},
 diff --git a/main.go b/main.go
@@ -41,12 +41,12 @@ index 0fd8f93..98db181 100644
  			}
  		}
 +		finalBytesBuffer.Write(delim[2])
- 
+
 -		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
 +		finalBytes := append(delim[0], bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim[1])[:]...)
  		finalBytesBuffer.Reset()
- 
+
  		// set the root window name
--- 
+--
 2.29.2
 

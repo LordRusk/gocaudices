@@ -2,7 +2,7 @@ package main
 
 var (
 	delim = []byte(" ") // the delimiter that will be used
-	shell = "dash"      // shell used
+	shell = "sh"        // shell used
 
 	Blocks = []Block{
 		{cmd: "recicon", upSig: 9},
