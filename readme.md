@@ -7,9 +7,9 @@ I wrote this alternative to be simple, fast, and elegant. This project is never 
 ## How-To
 Gocaudices is configured through editing it's source code. This makes it extremely slim, fast, and secure. Since `main.go` is only ~100 SLOC, it makes it extremely simple to edit and add features.
 
-- Download
+- How To
 
-First download gocaudices with `git clone https://github.com/lordrusk/gocaudices`. You can (re)compile with `go install`.
+First download gocaudices with: ```git clone https://github.com/lordrusk/gocaudices``` You can (re)compile with: ```go install```
 
 - Configure
 
@@ -21,11 +21,9 @@ To run shell commands, add `inSh: true,` to the block in `blocks.go`. You can al
 
 - Update a module
 
-The `Block` definition of `Block{Cmd: "volume", UpSig: 10},` would be updated like `kill -44 $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -44 $(pidof gocaudices)") },`.
+The `Block` definition of `{cmd: "volume", upSig: 10},` would be updated like `kill -44 $(pidof gocaudices)`. A dwm volume mute keybind might look like `{ 0, XF86XK_AudioMute, spawn, SHCMD("pamixer -t; kill -44 $(pidof gocaudices)") },`.
 
 ## (Non)-Features
-+ Gocaudices automatically trims raw bytes from the end of block outputs on a block by block basis. This keeps the bar looking nice.
-
 + Multiple blocks can have the same update signal.
 
 ## FQA -- Frequently Questioned Answers

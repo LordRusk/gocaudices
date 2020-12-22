@@ -33,9 +33,15 @@ var (
 )
 
 func runBlock(block Block) {
-	outputBytes, err := exec.Command(block.args[0], block.args[1:]...).Output()
+	var outputBytes []byte
+	var err error
+	if len(block.args) < 2 {
+		outputBytes, err = exec.Command(block.cmd).Output()
+	} else {
+		outputBytes, err = exec.Command(block.args[0], block.args[1:]...).Output()
+	}
 	if err != nil {
-		log.Printf("Failed to update `%v` | %v", block.cmd, err)
+		log.Printf("Failed to update `%v` | %v\n", block.cmd, err)
 	} else {
 		barBytesArr[block.pos] = bytes.TrimSpace(outputBytes)
 		updateChan <- nil
@@ -52,8 +58,7 @@ func main() {
 	defer x.Close()
 	root = xproto.Setup(x).DefaultScreen(x).Root
 
-	// initialize blocks
-	for i := 0; i < len(Blocks); i++ {
+	for i := 0; i < len(Blocks); i++ { // initialize blocks
 		go func(i int) {
 			Blocks[i].pos = i
 
@@ -73,8 +78,7 @@ func main() {
 		}(i)
 	}
 
-	// handle signals
-	for _, block := range Blocks {
+	for _, block := range Blocks { // handle signals
 		if block.upSig != 0 {
 			signal.Notify(sigChan, syscall.Signal(34+block.upSig))
 			signalMap[syscall.Signal(34+block.upSig)] = append(signalMap[syscall.Signal(34+block.upSig)], block)
@@ -91,7 +95,7 @@ func main() {
 	}()
 
 	var finalBytesBuffer bytes.Buffer
-	for _ = range updateChan {
+	for range updateChan { // update bar on signal
 		for i := 0; i < len(Blocks); i++ {
 			if barBytesArr[i] != nil {
 				finalBytesBuffer.Write(delim)
@@ -102,7 +106,7 @@ func main() {
 		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
 		finalBytesBuffer.Reset()
 
-		// set new root window name
+		// set the new root window name
 		xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes)
 	}
 }
