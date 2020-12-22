@@ -23,7 +23,6 @@ var (
 		{cmd: "volume", upSig: 10},
 		{cmd: "battery", upInt: 5, upSig: 3},
 		{cmd: "clock", upSig: 1},
-		{cmd: "sip", upInt: 10, upSig: 2},
 		{cmd: "internet", upInt: 5, upSig: 4},
 	}
 )
