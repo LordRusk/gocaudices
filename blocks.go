@@ -1,12 +1,8 @@
 package main
 
 var (
-	delim = [3][]byte{ // the delimiter that will be used
-		{'['},         // bytes on the left side
-		[]byte("] ["), // bytes inbetween blocks
-		{']'},         // bytes on the right side
-	}
-	shell = "sh" // shell used
+	delim = []byte(" ") // the delimiter that will be used
+	shell = "sh"        // shell used
 
 	blocks = []block{
 		{cmd: "recicon", upSig: 9},
