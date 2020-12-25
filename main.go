@@ -100,12 +100,13 @@ func main() {
 	for range updateChan { // update bar on signal
 		for num, _ := range blocks {
 			if barBytesArr[num] != nil {
-				finalBytesBuffer.Write(delim)
+				finalBytesBuffer.Write(delim[1])
 				finalBytesBuffer.Write(barBytesArr[num])
 			}
 		}
+		finalBytesBuffer.Write(delim[2])
 
-		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
+		finalBytes := append(delim[0], bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim[1])[:]...)
 		xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes) // set the root window name
 		finalBytesBuffer.Reset()
 	}
