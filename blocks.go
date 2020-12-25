@@ -4,7 +4,7 @@ var (
 	delim = []byte(" ") // the delimiter that will be used
 	shell = "sh"        // shell used
 
-	Blocks = []Block{
+	blocks = []block{
 		{cmd: "recicon", upSig: 9},
 		{cmd: "music", upSig: 11},
 		{cmd: "pacpackages", upSig: 8},
