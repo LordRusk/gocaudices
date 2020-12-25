@@ -1,7 +1,7 @@
-From f481a5812e8e021e97e120f74dfaf6984ad56b66 Mon Sep 17 00:00:00 2001
+From 9023b4714d4373fb0f89f67d73cba7ceadb99493 Mon Sep 17 00:00:00 2001
 From: rusk <lordruskk@gmail.com>
-Date: Mon, 21 Dec 2020 19:26:23 -0800
-Subject: [PATCH] Add ability for complex delimiters
+Date: Thu, 24 Dec 2020 20:21:35 -0800
+Subject: [PATCH] Adds more complex delimiter abilites
 
 ---
  blocks.go | 8 ++++++--
@@ -9,44 +9,44 @@ Subject: [PATCH] Add ability for complex delimiters
  2 files changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/blocks.go b/blocks.go
-index 2aa3234..d3ea89a 100644
+index f96e47c..36543ce 100644
 --- a/blocks.go
 +++ b/blocks.go
 @@ -1,8 +1,12 @@
  package main
-
+ 
  var (
 -	delim = []byte(" ") // the delimiter that will be used
--	shell = "sh"      // shell used
+-	shell = "sh"        // shell used
 +	delim = [3][]byte{ // the delimiter that will be used
-+		{'['}, // bytes on the left side
++		{'['},         // bytes on the left side
 +		[]byte("] ["), // bytes inbetween blocks
-+		{']'}, // bytes on the right side
++		{']'},         // bytes on the right side
 +	}
 +	shell = "sh" // shell used
-
- 	Blocks = []Block{
+ 
+ 	blocks = []block{
  		{cmd: "recicon", upSig: 9},
 diff --git a/main.go b/main.go
-index 0fd8f93..98db181 100644
+index aefca67..f4d9665 100644
 --- a/main.go
 +++ b/main.go
-@@ -98,12 +98,13 @@ func main() {
+@@ -100,12 +100,13 @@ func main() {
  	for range updateChan { // update bar on signal
- 		for i := 0; i < len(Blocks); i++ {
- 			if barBytesArr[i] != nil {
+ 		for num, _ := range blocks {
+ 			if barBytesArr[num] != nil {
 -				finalBytesBuffer.Write(delim)
 +				finalBytesBuffer.Write(delim[1])
- 				finalBytesBuffer.Write(barBytesArr[i])
+ 				finalBytesBuffer.Write(barBytesArr[num])
  			}
  		}
 +		finalBytesBuffer.Write(delim[2])
-
+ 
 -		finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
 +		finalBytes := append(delim[0], bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim[1])[:]...)
+ 		xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes) // set the root window name
  		finalBytesBuffer.Reset()
-
- 		// set the root window name
---
+ 	}
+-- 
 2.29.2
 
