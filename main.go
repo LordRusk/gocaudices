@@ -70,6 +70,11 @@ func main() {
 				}
 			}
 
+			if blocks[i].upSig != 0 {
+				signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
+				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
+			}
+
 			runBlock(blocks[i])
 			if blocks[i].upInt != 0 {
 				for {
@@ -80,14 +85,7 @@ func main() {
 		}(i)
 	}
 
-	for _, b := range blocks { // handle signals
-		if b.upSig != 0 {
-			signal.Notify(sigChan, syscall.Signal(34+b.upSig))
-			signalMap[syscall.Signal(34+b.upSig)] = append(signalMap[syscall.Signal(34+b.upSig)], b)
-		}
-	}
-
-	go func() {
+	go func() { // handle signals
 		for sig := range sigChan {
 			bs, _ := signalMap[sig]
 			for _, b := range bs {
