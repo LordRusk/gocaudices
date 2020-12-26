@@ -1,43 +1,45 @@
-From 9023b4714d4373fb0f89f67d73cba7ceadb99493 Mon Sep 17 00:00:00 2001
+From 59f7f4a469a694c2da20e5fc8827c66c6645047a Mon Sep 17 00:00:00 2001
 From: rusk <lordruskk@gmail.com>
-Date: Thu, 24 Dec 2020 20:21:35 -0800
-Subject: [PATCH] Adds more complex delimiter abilites
+Date: Fri, 25 Dec 2020 19:08:33 -0800
+Subject: [PATCH] add more complex delimiter
 
 ---
- blocks.go | 8 ++++++--
- main.go   | 5 +++--
- 2 files changed, 9 insertions(+), 4 deletions(-)
+ blocks.go | 10 +++++++---
+ main.go   |  5 +++--
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/blocks.go b/blocks.go
-index f96e47c..36543ce 100644
+index 24d422f..dd467ee 100644
 --- a/blocks.go
 +++ b/blocks.go
-@@ -1,8 +1,12 @@
+@@ -1,9 +1,13 @@
  package main
  
  var (
--	delim = []byte(" ") // the delimiter that will be used
--	shell = "sh"        // shell used
+-	delim     = []byte(" ") // the delimiter that will be used
+-	shell     = "sh"        // shell used
+-	cmdstropt = "-c"        // command string opt for shell
 +	delim = [3][]byte{ // the delimiter that will be used
 +		{'['},         // bytes on the left side
 +		[]byte("] ["), // bytes inbetween blocks
 +		{']'},         // bytes on the right side
 +	}
-+	shell = "sh" // shell used
++	shell     = "sh" // shell used
++	cmdstropt = "-c" // command string opt for shell
  
  	blocks = []block{
  		{cmd: "recicon", upSig: 9},
 diff --git a/main.go b/main.go
-index aefca67..f4d9665 100644
+index 4f39d55..e758bee 100644
 --- a/main.go
 +++ b/main.go
 @@ -100,12 +100,13 @@ func main() {
  	for range updateChan { // update bar on signal
- 		for num, _ := range blocks {
- 			if barBytesArr[num] != nil {
+ 		for _, b := range blocks {
+ 			if barBytesArr[b.pos] != nil {
 -				finalBytesBuffer.Write(delim)
 +				finalBytesBuffer.Write(delim[1])
- 				finalBytesBuffer.Write(barBytesArr[num])
+ 				finalBytesBuffer.Write(barBytesArr[b.pos])
  			}
  		}
 +		finalBytesBuffer.Write(delim[2])
