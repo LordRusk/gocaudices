@@ -20,7 +20,7 @@ type block struct {
 	inSh  bool
 	upInt int
 	upSig int
-	pos   int
+	pos   int // used internally
 }
 
 var updateChan = make(chan interface{}, 1)
@@ -63,7 +63,7 @@ func main() {
 			blocks[i].pos = i
 
 			if blocks[i].inSh {
-				blocks[i].args = []string{shell, "-c", blocks[i].cmd}
+				blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
 			} else {
 				if strings.Contains(blocks[i].cmd, " ") {
 					blocks[i].args = strings.Split(blocks[i].cmd, " ")
@@ -98,10 +98,10 @@ func main() {
 
 	var finalBytesBuffer bytes.Buffer
 	for range updateChan { // update bar on signal
-		for num, _ := range blocks {
-			if barBytesArr[num] != nil {
+		for _, b := range blocks {
+			if barBytesArr[b.pos] != nil {
 				finalBytesBuffer.Write(delim)
-				finalBytesBuffer.Write(barBytesArr[num])
+				finalBytesBuffer.Write(barBytesArr[b.pos])
 			}
 		}
 

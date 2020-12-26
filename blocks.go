@@ -1,8 +1,9 @@
 package main
 
 var (
-	delim = []byte(" ") // the delimiter that will be used
-	shell = "sh"        // shell used
+	delim     = []byte(" ") // the delimiter that will be used
+	shell     = "sh"        // shell used
+	cmdstropt = "-c"        // command string opt for shell
 
 	blocks = []block{
 		{cmd: "recicon", upSig: 9},
