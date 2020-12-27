@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/lordrusk/gocaudices)](https://goreportcard.com/report/github.com/lordrusk/gocaudices)
+
 # An extremely simple dwmblocks alternative
 Gocaudices is a dwmblocks alternative written in GO in less than 100 SLOC using [xgb](https://github.com/BurntSushi/xgb).
 
