@@ -28,9 +28,6 @@ var barBytesArr = make([][]byte, len(blocks))
 var sigChan = make(chan os.Signal, 1024)
 var signalMap = make(map[os.Signal][]block)
 
-var x *xgb.Conn        // global X connection
-var root xproto.Window // global root window
-
 func runBlock(b block) {
 	var outputBytes []byte
 	var err error
@@ -50,13 +47,12 @@ func runBlock(b block) {
 
 func main() {
 	// setup X
-	var err error
-	x, err = xgb.NewConn()
+	x, err := xgb.NewConn()
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer x.Close()
-	root = xproto.Setup(x).DefaultScreen(x).Root
+	root := xproto.Setup(x).DefaultScreen(x).Root
 
 	for i := 0; i < len(blocks); i++ { // initialize blocks
 		go func(i int) {
