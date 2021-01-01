@@ -42,7 +42,6 @@ func runBlock(b block) {
 	}
 
 	barBytesArr[b.pos] = bytes.TrimSpace(outputBytes)
-	updateChan <- nil
 }
 
 func main() {
@@ -55,31 +54,33 @@ func main() {
 	root := xproto.Setup(x).DefaultScreen(x).Root
 
 	for i := 0; i < len(blocks); i++ { // initialize blocks
-		go func(i int) {
-			blocks[i].pos = i
+		blocks[i].pos = i
 
-			if blocks[i].inSh {
-				blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
-			} else {
-				if strings.Contains(blocks[i].cmd, " ") {
-					blocks[i].args = strings.Split(blocks[i].cmd, " ")
-				}
+		if blocks[i].inSh {
+			blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
+		} else {
+			if strings.Contains(blocks[i].cmd, " ") {
+				blocks[i].args = strings.Split(blocks[i].cmd, " ")
 			}
+		}
 
-			if blocks[i].upSig != 0 {
-				signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
-				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
-			}
+		if blocks[i].upSig != 0 {
+			signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
+			signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
+		}
 
-			runBlock(blocks[i])
-			if blocks[i].upInt != 0 {
+		runBlock(blocks[i])
+		if blocks[i].upInt != 0 {
+			go func(i int) {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
 					runBlock(blocks[i])
+					updateChan <- nil
 				}
-			}
-		}(i)
+			}(i)
+		}
 	}
+	updateChan <- nil
 
 	go func() { // handle signals
 		for sig := range sigChan {
@@ -87,6 +88,7 @@ func main() {
 			for _, b := range bs {
 				runBlock(b)
 			}
+			updateChan <- nil
 		}
 	}()
 
