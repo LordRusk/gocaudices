@@ -75,12 +75,15 @@ func main() {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
 					runBlock(blocks[i])
-					updateChan <- nil
+					select {
+					case updateChan <- nil:
+					default:
+					}
 				}
 			}(i)
 		}
 	}
-	updateChan <- nil
+	updateChan <- nil:
 
 	go func() { // handle signals
 		for sig := range sigChan {
@@ -88,7 +91,10 @@ func main() {
 			for _, b := range bs {
 				runBlock(b)
 			}
-			updateChan <- nil
+			select {
+			case updateChan <- nil:
+			default:
+			}
 		}
 	}()
 
