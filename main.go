@@ -75,10 +75,7 @@ func main() {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
 					runBlock(blocks[i])
-					select {
-						case updateChan <- nil:
-						default:
-					}
+					updateChan <- nil
 				}
 			}(i)
 		}
@@ -99,16 +96,16 @@ func main() {
 			finalBytesBuffer.Reset()
 		}
 	}()
-	updateChan <- nil // initially update the bar
+	select { // safety incase update is already buffered
+	case updateChan <- nil: // initially update the bar
+	default:
+	}
 
 	for sig := range sigChan { // handle signals
 		bs, _ := signalMap[sig]
 		for _, b := range bs {
 			runBlock(b)
 		}
-		select {
-		case updateChan <- nil:
-		default:
-		}
+		updateChan <- nil
 	}
 }
