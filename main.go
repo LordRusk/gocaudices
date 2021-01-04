@@ -96,10 +96,7 @@ func main() {
 			finalBytesBuffer.Reset()
 		}
 	}()
-	select { // safety incase update is already buffered
-	case updateChan <- nil: // initially update the bar
-	default:
-	}
+	updateChan <- nil // initially update the bar
 
 	for sig := range sigChan { // handle signals
 		bs, _ := signalMap[sig]
