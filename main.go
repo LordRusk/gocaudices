@@ -27,13 +27,7 @@ type block struct {
 var barBytesArr = make([][]byte, len(blocks))
 
 func runBlock(b block) {
-	var outputBytes []byte
-	var err error
-	if len(b.args) == 1 {
-		outputBytes, err = exec.Command(b.args[0]).Output()
-	} else {
-		outputBytes, err = exec.Command(b.args[0], b.args[1:]...).Output()
-	}
+	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
 	if err != nil {
 		log.Printf("Failed to update `%v` | %v\n", b.cmd, err)
 		return
@@ -56,29 +50,29 @@ func main() {
 	signalMap := make(map[os.Signal][]block)
 
 	for i := 0; i < len(blocks); i++ { // initialize blocks
-		blocks[i].pos = i
+		go func(i int) {
+			blocks[i].pos = i
 
-		if blocks[i].inSh {
-			blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
-		} else {
-			blocks[i].args = strings.Split(blocks[i].cmd, " ")
-		}
+			if blocks[i].inSh {
+				blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
+			} else {
+				blocks[i].args = strings.Split(blocks[i].cmd, " ")
+			}
 
-		if blocks[i].upSig != 0 {
-			signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
-			signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
-		}
+			if blocks[i].upSig != 0 {
+				signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
+				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
+			}
 
-		runBlock(blocks[i])
-		if blocks[i].upInt != 0 {
-			go func(i int) {
+			runBlock(blocks[i])
+			if blocks[i].upInt != 0 {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
 					runBlock(blocks[i])
 					updateChan <- nil
 				}
-			}(i)
-		}
+			}
+		}(i)
 	}
 
 	go func() { // update bar on signal
