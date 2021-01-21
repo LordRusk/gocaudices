@@ -24,6 +24,7 @@ type block struct {
 	pos  int      // used internally
 }
 
+var updateChan = make(chan interface{})
 var barBytesArr = make([][]byte, len(blocks))
 
 func runBlock(b block) {
@@ -34,6 +35,7 @@ func runBlock(b block) {
 	}
 
 	barBytesArr[b.pos] = bytes.TrimSpace(outputBytes)
+	updateChan <- nil
 }
 
 func main() {
@@ -45,9 +47,9 @@ func main() {
 	defer x.Close()
 	root := xproto.Setup(x).DefaultScreen(x).Root
 
-	updateChan := make(chan interface{}, 1)
 	sigChan := make(chan os.Signal, 1024)
 	signalMap := make(map[os.Signal][]block)
+	upIntMap := make(map[time.Duration][]block)
 
 	for i := 0; i < len(blocks); i++ { // initialize blocks
 		go func(i int) {
@@ -64,12 +66,15 @@ func main() {
 				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
 			}
 
+			if blocks[i].upInt != 0 {
+				upIntMap[time.Duration(blocks[i].upInt)*time.Second] = append(upIntMap[time.Duration(blocks[i].upInt)*time.Second], blocks[i])
+			}
+
 			runBlock(blocks[i])
 			if blocks[i].upInt != 0 {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
 					runBlock(blocks[i])
-					updateChan <- nil
 				}
 			}
 		}(i)
