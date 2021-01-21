@@ -89,7 +89,6 @@ func main() {
 			finalBytesBuffer.Reset()
 		}
 	}()
-	updateChan <- nil // initially update the bar
 
 	for sig := range sigChan { // handle signals
 		bs, _ := signalMap[sig]
