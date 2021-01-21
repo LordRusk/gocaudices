@@ -39,8 +39,7 @@ func runBlock(b block) {
 }
 
 func main() {
-	// connect to X
-	x, err := xgb.NewConn()
+	x, err := xgb.NewConn() // connect to X
 	if err != nil {
 		log.Fatalf("Cannot connect to X! | %v\n", err)
 	}
@@ -49,7 +48,6 @@ func main() {
 
 	sigChan := make(chan os.Signal, 1024)
 	signalMap := make(map[os.Signal][]block)
-	upIntMap := make(map[time.Duration][]block)
 
 	for i := 0; i < len(blocks); i++ { // initialize blocks
 		go func(i int) {
@@ -64,10 +62,6 @@ func main() {
 			if blocks[i].upSig != 0 {
 				signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
 				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
-			}
-
-			if blocks[i].upInt != 0 {
-				upIntMap[time.Duration(blocks[i].upInt)*time.Second] = append(upIntMap[time.Duration(blocks[i].upInt)*time.Second], blocks[i])
 			}
 
 			runBlock(blocks[i])
