@@ -95,6 +95,5 @@ func main() {
 		for _, b := range bs {
 			runBlock(b)
 		}
-		updateChan <- nil
 	}
 }
