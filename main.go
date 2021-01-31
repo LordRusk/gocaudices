@@ -30,7 +30,7 @@ var barBytesArr = make([][]byte, len(blocks))
 func runBlock(b block) {
 	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
 	if err != nil {
-		log.Printf("Failed to update `%v` | %v\n", b.cmd, err)
+		log.Printf("Failed to update `%s`: %s: %s\n", b.cmd, outputBytes, err)
 		return
 	}
 
@@ -41,7 +41,7 @@ func runBlock(b block) {
 func main() {
 	x, err := xgb.NewConn() // connect to X
 	if err != nil {
-		log.Fatalf("Cannot connect to X! | %v\n", err)
+		log.Fatalf("Cannot connect to X: %s\n", err)
 	}
 	defer x.Close()
 	root := xproto.Setup(x).DefaultScreen(x).Root
@@ -64,7 +64,7 @@ func main() {
 				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
 			}
 
-			runBlock(blocks[i])
+			runBlock(blocks[i]) // initially build bar
 			if blocks[i].upInt != 0 {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
