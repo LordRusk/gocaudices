@@ -93,7 +93,7 @@ func main() {
 	for sig := range sigChan { // handle signals
 		bs, _ := signalMap[sig]
 		for _, b := range bs {
-			runBlock(b)
+			go runBlock(b)
 		}
 	}
 }
