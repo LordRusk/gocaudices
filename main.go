@@ -28,9 +28,9 @@ var updateChan = make(chan interface{})
 var barBytesArr = make([][]byte, len(blocks))
 
 func runBlock(b block) {
-	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
+	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).CombinedOutput()
 	if err != nil {
-		log.Printf("Failed to update `%s`: %s: %s\n", b.cmd, outputBytes, err)
+		log.Printf("Failed to update `%s`: %s: %s\n", b.cmd, bytes.TrimSpace(outputBytes), err)
 		return
 	}
 
