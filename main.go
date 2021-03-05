@@ -91,11 +91,11 @@ func main() {
 	}()
 
 	for sig := range sigChan { // handle signals
-		go func() {
+		go func(sig os.Signal) {
 			bs, _ := signalMap[sig]
 			for _, b := range bs {
 				go runBlock(b)
 			}
-		}()
+		}(sig)
 	}
 }
