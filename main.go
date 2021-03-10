@@ -24,7 +24,7 @@ type block struct {
 	pos  int      // used internally
 }
 
-var updateChan = make(chan interface{})
+var updateChan = make(chan struct{})
 var barBytesArr = make([][]byte, len(blocks))
 
 func runBlock(b block) {
@@ -35,7 +35,7 @@ func runBlock(b block) {
 	}
 
 	barBytesArr[b.pos] = bytes.TrimSpace(outputBytes)
-	updateChan <- nil
+	updateChan <- struct{}{}
 }
 
 func main() {
