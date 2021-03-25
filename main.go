@@ -24,19 +24,19 @@ type block struct {
 	pos  int      // used internally
 }
 
-var updateChan = make(chan struct{})
-var barBytesArr = make([][]byte, len(blocks))
-
-func runBlock(b block) {
-	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).CombinedOutput()
+func (b *block) run() {
+	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
 	if err != nil {
-		log.Printf("Failed to update `%s`: %s: %s\n", b.cmd, bytes.TrimSpace(outputBytes), err)
+		log.Printf("Failed to update `%s`: %s\n", b.cmd, err)
 		return
 	}
 
 	barBytesArr[b.pos] = bytes.TrimSpace(outputBytes)
 	updateChan <- struct{}{}
 }
+
+var updateChan = make(chan struct{})
+var barBytesArr = make([][]byte, len(blocks))
 
 func main() {
 	x, err := xgb.NewConn() // connect to X
@@ -64,11 +64,11 @@ func main() {
 				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
 			}
 
-			runBlock(blocks[i]) // initially build bar
+			blocks[i].run() // initially build bar
 			if blocks[i].upInt != 0 {
 				for {
 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
-					runBlock(blocks[i])
+					blocks[i].run()
 				}
 			}
 		}(i)
@@ -94,7 +94,7 @@ func main() {
 		go func(sig os.Signal) {
 			bs, _ := signalMap[sig]
 			for _, b := range bs {
-				go runBlock(b)
+				go b.run()
 			}
 		}(sig)
 	}
