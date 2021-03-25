@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"log"
 	"os"
 	"os/exec"
@@ -12,7 +13,10 @@ import (
 
 	"github.com/BurntSushi/xgb"
 	"github.com/BurntSushi/xgb/xproto"
+	"github.com/pkg/profile"
 )
+
+var sleep = flag.Int("s", 5, "Set the default time before gocaudices is killed")
 
 type block struct {
 	cmd   string
@@ -39,6 +43,13 @@ var updateChan = make(chan struct{})
 var barBytesArr = make([][]byte, len(blocks))
 
 func main() {
+	// cpu profiler
+	// defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	// memory profiler
+	// defer profile.Start(profile.MemProfile(1), profile.ProfilePath(".")).Stop()
+	// big memory profiler
+	// defer profile.Start(profile.MemProfile, profile.MemProfileRate(1), profile.ProfilePath(".")).Stop()
+
 	x, err := xgb.NewConn() // connect to X
 	if err != nil {
 		log.Fatalf("Cannot connect to X: %s\n", err)
@@ -89,13 +100,16 @@ func main() {
 			finalBytesBuffer.Reset()
 		}
 	}()
+	go func() {
+		for sig := range sigChan { // handle signals
+			go func(sig os.Signal) {
+				bs, _ := signalMap[sig]
+				for _, b := range bs {
+					go b.run()
+				}
+			}(sig)
+		}
+	}()
 
-	for sig := range sigChan { // handle signals
-		go func(sig os.Signal) {
-			bs, _ := signalMap[sig]
-			for _, b := range bs {
-				go b.run()
-			}
-		}(sig)
-	}
+	time.Sleep(time.Duration(*sleep) * time.Second)
 }
