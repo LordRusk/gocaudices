@@ -14,6 +14,9 @@ import (
 	"github.com/BurntSushi/xgb/xproto"
 )
 
+var updateChan = make(chan struct{})
+var barBytesArr = make([][]byte, len(blocks))
+
 type block struct {
 	cmd   string
 	inSh  bool
@@ -34,9 +37,6 @@ func (b *block) run() {
 	barBytesArr[b.pos] = bytes.TrimSpace(outputBytes)
 	updateChan <- struct{}{}
 }
-
-var updateChan = make(chan struct{})
-var barBytesArr = make([][]byte, len(blocks))
 
 func main() {
 	x, err := xgb.NewConn() // connect to X
@@ -77,10 +77,10 @@ func main() {
 	go func() { // update bar on signal
 		var finalBytesBuffer bytes.Buffer
 		for range updateChan {
-			for _, b := range blocks {
-				if barBytesArr[b.pos] != nil {
+			for i := 0; i < len(blocks); i++ {
+				if barBytesArr[blocks[i].pos] != nil {
 					finalBytesBuffer.Write(delim)
-					finalBytesBuffer.Write(barBytesArr[b.pos])
+					finalBytesBuffer.Write(barBytesArr[blocks[i].pos])
 				}
 			}
 
