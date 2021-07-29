@@ -1,7 +1,7 @@
-From 4092f85f4bf9283051cf19dd84348f025fc46ae4 Mon Sep 17 00:00:00 2001
+From b4482e454cb80e89decd80ad00421d9b8aa141ff Mon Sep 17 00:00:00 2001
 From: rusk <lordruskk@gmail.com>
-Date: Sun, 3 Jan 2021 23:34:39 -0800
-Subject: [PATCH] add more complex delimiter
+Date: Thu, 29 Jul 2021 00:45:11 -0700
+Subject: [PATCH] adds a more complex delimiter
 
 ---
  blocks.go | 10 +++++++---
@@ -30,16 +30,16 @@ index 24d422f..dd467ee 100644
  	blocks = []block{
  		{cmd: "recicon", upSig: 9},
 diff --git a/main.go b/main.go
-index 83509a1..f5a7107 100644
+index 2d5edd2..fae01d2 100644
 --- a/main.go
 +++ b/main.go
-@@ -86,12 +86,13 @@ func main() {
+@@ -79,12 +79,13 @@ func main() {
  		for range updateChan {
- 			for _, b := range blocks {
- 				if barBytesArr[b.pos] != nil {
+ 			for i := 0; i < len(blocks); i++ {
+ 				if barBytesArr[blocks[i].pos] != nil {
 -					finalBytesBuffer.Write(delim)
 +					finalBytesBuffer.Write(delim[1])
- 					finalBytesBuffer.Write(barBytesArr[b.pos])
+ 					finalBytesBuffer.Write(barBytesArr[blocks[i].pos])
  				}
  			}
 +			finalBytesBuffer.Write(delim[2])
@@ -50,5 +50,5 @@ index 83509a1..f5a7107 100644
  			finalBytesBuffer.Reset()
  		}
 -- 
-2.30.0
+2.32.0
 
