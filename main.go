@@ -10,12 +10,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/BurntSushi/xgb"
-	"github.com/BurntSushi/xgb/xproto"
+	"github.com/jezek/xgb"
+	"github.com/jezek/xgb/xproto"
 )
-
-var updateChan = make(chan struct{})
-var barBytesArr = make([][]byte, len(blocks))
 
 type block struct {
 	cmd   string
@@ -26,6 +23,9 @@ type block struct {
 	args []string // used internally
 	pos  int      // used internally
 }
+
+var updateChan = make(chan struct{})
+var barBytesArr = make([][]byte, len(blocks))
 
 func (b *block) run() {
 	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
@@ -92,7 +92,7 @@ func main() {
 
 	for sig := range sigChan { // handle signals
 		go func(sig *os.Signal) {
-			bs, _ := signalMap[*sig]
+			bs := signalMap[*sig]
 			for _, b := range bs {
 				go b.run()
 			}
