@@ -34,7 +34,7 @@ func (b *block) run() {
 		return
 	}
 
-	barBytesArr[b.pos] = bytes.TrimSpace(outputBytes)
+	barBytesArr[b.pos] = bytes.TrimSpace(bytes.Split(outputBytes, []byte("\n"))[0])
 	updateChan <- struct{}{}
 }
 
@@ -78,9 +78,9 @@ func main() {
 		var finalBytesBuffer bytes.Buffer
 		for range updateChan {
 			for i := 0; i < len(blocks); i++ {
-				if barBytesArr[blocks[i].pos] != nil {
+				if barBytesArr[i] != nil {
 					finalBytesBuffer.Write(delim)
-					finalBytesBuffer.Write(barBytesArr[blocks[i].pos])
+					finalBytesBuffer.Write(barBytesArr[i])
 				}
 			}
 
