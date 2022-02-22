@@ -1,6 +1,6 @@
-From b4482e454cb80e89decd80ad00421d9b8aa141ff Mon Sep 17 00:00:00 2001
+From eed37977796f0afc5ed7865b20265b85f3601783 Mon Sep 17 00:00:00 2001
 From: rusk <lordruskk@gmail.com>
-Date: Thu, 29 Jul 2021 00:45:11 -0700
+Date: Mon, 21 Feb 2022 17:29:48 -0800
 Subject: [PATCH] adds a more complex delimiter
 
 ---
@@ -30,25 +30,25 @@ index 24d422f..dd467ee 100644
  	blocks = []block{
  		{cmd: "recicon", upSig: 9},
 diff --git a/main.go b/main.go
-index 2d5edd2..fae01d2 100644
+index 5f60ba2..30249d9 100644
 --- a/main.go
 +++ b/main.go
 @@ -79,12 +79,13 @@ func main() {
  		for range updateChan {
  			for i := 0; i < len(blocks); i++ {
- 				if barBytesArr[blocks[i].pos] != nil {
+ 				if barBytesArr[i] != nil {
 -					finalBytesBuffer.Write(delim)
 +					finalBytesBuffer.Write(delim[1])
- 					finalBytesBuffer.Write(barBytesArr[blocks[i].pos])
+ 					finalBytesBuffer.Write(barBytesArr[i])
  				}
  			}
 +			finalBytesBuffer.Write(delim[2])
  
 -			finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
-+			finalBytes := append(delim[0], bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim[1])[:]...)
++			finalBytes := append(delim[0], bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim[1])...)
  			xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes) // set the root window name
  			finalBytesBuffer.Reset()
  		}
 -- 
-2.32.0
+2.35.1
 
