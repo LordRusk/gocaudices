@@ -26,7 +26,7 @@ Patches are hosted in this repo in `patches/*patch*`. To apply patches: `patch -
 
 [complexdelim](https://github.com/LordRusk/gocaudices/tree/master/patches/complexdelim)
 
-[status2d](https://github.com/LordRusk/gocaudices/tree/master/patches/status2D)
+[status2d](https://github.com/LordRusk/gocaudices/tree/master/patches/status2d)
 
 ## (Non)-Features
 + Multiple blocks can have the same update signal.
