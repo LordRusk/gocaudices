@@ -69,9 +69,9 @@ index 5f60ba2..17b134c 100644
  			for i := 0; i < len(blocks); i++ {
  				if barBytesArr[i] != nil {
  					finalBytesBuffer.Write(delim)
-+					finalBytesBuffer.Write([]byte(blocks[i].befstr))
++					finalBytesBuffer.WriteString(blocks[i].befstr)
  					finalBytesBuffer.Write(barBytesArr[i])
-+					finalBytesBuffer.Write([]byte(blocks[i].aftstr))
++					finalBytesBuffer.WriteString(blocks[i].aftstr)
  				}
  			}
 
