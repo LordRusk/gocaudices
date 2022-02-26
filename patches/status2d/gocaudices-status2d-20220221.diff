@@ -1,0 +1,80 @@
+From f8ab4e718009faa0aa597e56367ee766450abdbf Mon Sep 17 00:00:00 2001
+From: rusk <lordruskk@gmail.com>
+Date: Mon, 21 Feb 2022 17:16:25 -0800
+Subject: [PATCH] Add's ability to add status2d text before and after the
+ output of a command
+
+---
+ blocks.go | 30 +++++++++++++++---------------
+ main.go   |  4 ++++
+ 2 files changed, 19 insertions(+), 15 deletions(-)
+
+diff --git a/blocks.go b/blocks.go
+index 24d422f..480ea6c 100644
+--- a/blocks.go
++++ b/blocks.go
+@@ -7,23 +7,23 @@ var (
+ 
+ 	blocks = []block{
+ 		{cmd: "recicon", upSig: 9},
+-		{cmd: "music", upSig: 11},
+-		{cmd: "pacpackages", upSig: 8},
++		{befstr: "^c#ffff80^", cmd: "music", aftstr: "^d^", upSig: 11},
++		{befstr: "^c#bb0000^", cmd: "pacpackages", aftstr: "^d^", upSig: 8},
+ 		{cmd: "news", upSig: 6},
+-		{cmd: "georona | cut -d' ' -f1,3", inSh: true, upInt: 18000, upSig: 19}, // example of command that is run in shell
+-		{cmd: "torrent", upInt: 10, upSig: 7},
+-		{cmd: "memory", upInt: 6, upSig: 14},
+-		{cmd: "cpu", upInt: 3, upSig: 13},
++		{befstr: "^c#FF0000^", cmd: "georona | cut -d' ' -f1,3", aftstr: "^d^", inSh: true, upInt: 18000, upSig: 19}, // example of command that is run in shell
++		{befstr: "^c#00ba00^", cmd: "torrent", aftstr: "^d^", upInt: 10, upSig: 7},
++		{befstr: "^c#00eFeF^", cmd: "memory", aftstr: "^d^", upInt: 6, upSig: 14},
++		{befstr: "^c#fdc000^", cmd: "cpu", aftstr: "^d^", upInt: 3, upSig: 13},
+ 		{cmd: "cpubars", upInt: 1, upSig: 22},
+-		{cmd: "disk /home", upInt: 7, upSig: 15},
+-		{cmd: "disk", upInt: 7, upSig: 15},
++		{befstr: "^c#BF40BF^", cmd: "disk /home", aftstr: "^d^", upInt: 7, upSig: 15},
++		{befstr: "^c#AA336A^", cmd: "disk", aftstr: "^d^", upInt: 7, upSig: 15},
+ 		{cmd: "astrological", upInt: 18000, upSig: 18},
+-		{cmd: "weather", upInt: 18000, upSig: 5},
+-		{cmd: "mailbox", upSig: 12},
+-		{cmd: "nettraf", upInt: 1, upSig: 16},
+-		{cmd: "volume", upSig: 10},
+-		{cmd: "battery", upInt: 5, upSig: 3},
+-		{cmd: "clock", upSig: 1},
+-		{cmd: "internet", upInt: 5, upSig: 4},
++		{befstr: "^c#ffff80^", cmd: "weather", aftstr: "^d^", upInt: 18000, upSig: 5},
++		{befstr: "^c#ffff80^", cmd: "mailbox", aftstr: "^d^", upSig: 12},
++		{befstr: "^c#00eeeb^", cmd: "nettraf", aftstr: "^d^", upInt: 1, upSig: 16},
++		{befstr: "^c#ffff80^", cmd: "volume", aftstr: "^d^", upSig: 10},
++		{befstr: "^c#bb0000^", cmd: "battery", aftstr: "^d^", upInt: 5, upSig: 3},
++		{befstr: "^c#00eaeb^", cmd: "clock", aftstr: "^d^", upSig: 1},
++		{befstr: "^c#fcd018^", cmd: "internet", aftstr: "^d^", upInt: 5, upSig: 4},
+ 	}
+ )
+diff --git a/main.go b/main.go
+index 5f60ba2..17b134c 100644
+--- a/main.go
++++ b/main.go
+@@ -20,6 +20,8 @@ type block struct {
+ 	upInt int
+ 	upSig int
+ 
++	befstr, aftstr string // befstr inserted before cmd | aftstr inserted after cmd
++
+ 	args []string // used internally
+ 	pos  int      // used internally
+ }
+@@ -80,7 +82,9 @@ func main() {
+ 			for i := 0; i < len(blocks); i++ {
+ 				if barBytesArr[i] != nil {
+ 					finalBytesBuffer.Write(delim)
++					finalBytesBuffer.Write([]byte(blocks[i].befstr))
+ 					finalBytesBuffer.Write(barBytesArr[i])
++					finalBytesBuffer.Write([]byte(blocks[i].befstr))
+ 				}
+ 			}
+ 
+-- 
+2.35.1
+
