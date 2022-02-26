@@ -14,7 +14,7 @@ index 24d422f..480ea6c 100644
 --- a/blocks.go
 +++ b/blocks.go
 @@ -7,23 +7,23 @@ var (
- 
+
  	blocks = []block{
  		{cmd: "recicon", upSig: 9},
 -		{cmd: "music", upSig: 11},
@@ -59,7 +59,7 @@ index 5f60ba2..17b134c 100644
 @@ -20,6 +20,8 @@ type block struct {
  	upInt int
  	upSig int
- 
+
 +	befstr, aftstr string // befstr inserted before cmd | aftstr inserted after cmd
 +
  	args []string // used internally
@@ -69,12 +69,12 @@ index 5f60ba2..17b134c 100644
  			for i := 0; i < len(blocks); i++ {
  				if barBytesArr[i] != nil {
  					finalBytesBuffer.Write(delim)
-+					finalBytesBuffer.Write([]byte(blocks[i].befstr))
++					finalBytesBuffer.WriteString(blocks[i].befstr)
  					finalBytesBuffer.Write(barBytesArr[i])
-+					finalBytesBuffer.Write([]byte(blocks[i].befstr))
++					finalBytesBuffer.WriteString(blocks[i].befstr)
  				}
  			}
- 
--- 
+
+--
 2.35.1
 
