@@ -1,0 +1,228 @@
+From 5ee3398fec011af8041d71802ae017256e1cbc58 Mon Sep 17 00:00:00 2001
+From: rusk <lordruskk@gmail.com>
+Date: Sat, 26 Feb 2022 13:09:20 -0800
+Subject: [PATCH] horrific bar clickability: stop clickability leakage
+
+---
+ main.go | 149 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 121 insertions(+), 28 deletions(-)
+
+diff --git a/main.go b/main.go
+index 5f60ba2..a177959 100644
+--- a/main.go
++++ b/main.go
+@@ -1,11 +1,38 @@
+ package main
+ 
++/*
++#include <signal.h>
++
++typedef struct {
++	int sig;
++	int button;
++} bridge;
++
++bridge kiss = {.sig = 0, .button = 0};
++
++static void sigHandler(int signum, siginfo_t *si, void *ucontext) {
++	kiss.sig = signum;
++	int button = si->si_value.sival_int;
++	kiss.button = button;
++}
++
++static void addSig(int sig) {
++	// static struct sigaction sa = { .sa_sigaction = sigHandler, .sa_flags = SA_ONSTACK };
++	// static struct sigaction sa = { .sa_sigaction = sigHandler, .sa_flags = SA_SIGINFO }; // haven't crashed yet 😎
++	static struct sigaction sa = { .sa_sigaction = sigHandler, .sa_flags = SA_SIGINFO|SA_ONSTACK }; // hopefully this works how I want it to
++	sigaction(sig, &sa, NULL);
++}
++*/
++import "C"
++
+ import (
+ 	"bytes"
++	"flag"
++	"fmt"
+ 	"log"
+ 	"os"
+ 	"os/exec"
+-	"os/signal"
++	"strconv"
+ 	"strings"
+ 	"syscall"
+ 	"time"
+@@ -14,6 +41,8 @@ import (
+ 	"github.com/jezek/xgb/xproto"
+ )
+ 
++var sigCheck = flag.Int("u", 20, "Check for a signal every ... milliseconds")
++
+ type block struct {
+ 	cmd   string
+ 	inSh  bool
+@@ -22,10 +51,13 @@ type block struct {
+ 
+ 	args []string // used internally
+ 	pos  int      // used internally
++
++	b byte // statuscmd raw byte
+ }
+ 
+-var updateChan = make(chan struct{})
++var updateChan = make(chan struct{}, len(blocks))
+ var barBytesArr = make([][]byte, len(blocks))
++var signalMap = make(map[os.Signal][]block)
+ 
+ func (b *block) run() {
+ 	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
+@@ -38,7 +70,70 @@ func (b *block) run() {
+ 	updateChan <- struct{}{}
+ }
+ 
++func (b *block) runBB(button int) {
++	cmd := exec.Command(b.args[0], b.args[1:]...)
++	cmd.Env = os.Environ()
++	cmd.Env = append(cmd.Env, "BUTTON="+strconv.Itoa(button))
++	outputBytes, err := cmd.CombinedOutput()
++	fmt.Printf("%s\n", outputBytes)
++	if err != nil {
++		log.Printf("Failed to update `%s` with button %d: %s: %s\n",
++			b.cmd, button, bytes.TrimSpace(outputBytes), err)
++		return
++	}
++
++	barBytesArr[b.pos] = bytes.TrimSpace(bytes.Split(outputBytes, []byte("\n"))[0])
++	updateChan <- struct{}{}
++}
++
++/*
++Please undeerstand I did not mean to write this function,
++this is horrific and I should be able to do it literally
++anything else. Short story we don't have access to the
++`siginfo_t` from go, which is where we get the button
++value. Not to mention C signal handlers must call
++async-signal-safe code, no GO code is async-signal-safe
++so I'm left with is this and a will for a patch I've wanted
++to implement for over two years. I'm just as unhappy
++with this as you are.
++*/
++func watchSignals() {
++watch:
++	if C.kiss.sig == C.int(0) {
++		time.Sleep(time.Millisecond * time.Duration(*sigCheck)) // wait before checking again
++		goto watch
++	}
++
++	fmt.Printf("signal: %d: button %d\n", C.kiss.sig, C.kiss.button)
++
++	sig, button := int(C.kiss.sig), int(C.kiss.button)
++	if button == 0 {
++		for _, b := range signalMap[syscall.Signal(sig)] {
++			go b.run()
++		}
++	} else {
++		for _, b := range signalMap[syscall.Signal(sig)] {
++			go b.runBB(button)
++		}
++	}
++
++	C.kiss.sig = C.int(0)
++	C.kiss.button = C.int(0)
++
++	goto watch
++}
++
++func intToRawByte(num int) byte {
++	var b byte
++	for i := 0; i < num; i++ {
++		b++
++	}
++	return b
++}
++
+ func main() {
++	flag.Parse()
++
+ 	x, err := xgb.NewConn() // connect to X
+ 	if err != nil {
+ 		log.Fatalf("Cannot connect to X: %s\n", err)
+@@ -46,32 +141,36 @@ func main() {
+ 	defer x.Close()
+ 	root := xproto.Setup(x).DefaultScreen(x).Root
+ 
+-	sigChan := make(chan os.Signal, 1024)
+-	signalMap := make(map[os.Signal][]block)
+-
+ 	for i := 0; i < len(blocks); i++ { // initialize blocks
+-		go func(i int) {
+-			blocks[i].pos = i
++		blocks[i].pos = i
+ 
+-			if blocks[i].inSh {
+-				blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
+-			} else {
+-				blocks[i].args = strings.Split(blocks[i].cmd, " ")
+-			}
++		if blocks[i].inSh {
++			blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
++		} else {
++			blocks[i].args = strings.Split(blocks[i].cmd, " ")
++		}
+ 
+-			if blocks[i].upSig != 0 {
+-				signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
+-				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
+-			}
++		if blocks[i].upSig != 0 {
++			C.addSig(C.int(34 + blocks[i].upSig))
++			signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
++			blocks[i].b = intToRawByte(blocks[i].upSig)
++		} else {
++			/* sig RTMIN+31 unused: keeps a clickable block from
++			 * infecting an unclickable neighbor with it's own
++			 * clickability.
++			 */
++			blocks[i].b = intToRawByte(31)
++		}
+ 
+-			blocks[i].run() // initially build bar
+-			if blocks[i].upInt != 0 {
++		blocks[i].run() // initially build bar
++		if blocks[i].upInt != 0 {
++			go func(i int) {
+ 				for {
+ 					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
+ 					blocks[i].run()
+ 				}
+-			}
+-		}(i)
++			}(i)
++		}
+ 	}
+ 
+ 	go func() { // update bar on signal
+@@ -80,6 +179,7 @@ func main() {
+ 			for i := 0; i < len(blocks); i++ {
+ 				if barBytesArr[i] != nil {
+ 					finalBytesBuffer.Write(delim)
++					finalBytesBuffer.WriteByte(blocks[i].b)
+ 					finalBytesBuffer.Write(barBytesArr[i])
+ 				}
+ 			}
+@@ -90,12 +190,5 @@ func main() {
+ 		}
+ 	}()
+ 
+-	for sig := range sigChan { // handle signals
+-		go func(sig *os.Signal) {
+-			bs := signalMap[*sig]
+-			for _, b := range bs {
+-				go b.run()
+-			}
+-		}(&sig)
+-	}
++	watchSignals() // handle signals :(
+ }
+-- 
+2.35.1
+
