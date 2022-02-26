@@ -1,0 +1,71 @@
+From e1e53dc3647c655cdca117a796a37053a6173374 Mon Sep 17 00:00:00 2001
+From: Ethan Marshall <ethan@ethanjmarshall.co.uk>
+Date: Sat, 26 Feb 2022 13:56:49 +0000
+Subject: [PATCH] Add support for dwm statuscolors
+
+---
+ blocks.go |  8 ++++++++
+ main.go   | 13 +++++++++++++
+ 2 files changed, 21 insertions(+)
+
+diff --git a/blocks.go b/blocks.go
+index 24d422f..37b371a 100644
+--- a/blocks.go
++++ b/blocks.go
+@@ -5,6 +5,14 @@ var (
+ 	shell     = "sh"        // shell used
+ 	cmdstropt = "-c"        // command string opt for shell
+ 
++	resetscheme = "default"	// the scheme to reset to default
++	schemes = map[string]byte{	// map of colors to dwm schemes in config.h/dwm.c
++		"default": 0x1,
++		"selected": 0x2,
++		"warning": 0x3,
++		"danger": 0x4,
++	}
++
+ 	blocks = []block{
+ 		{cmd: "recicon", upSig: 9},
+ 		{cmd: "music", upSig: 11},
+diff --git a/main.go b/main.go
+index 5f60ba2..4c4669b 100644
+--- a/main.go
++++ b/main.go
+@@ -16,6 +16,7 @@ import (
+ 
+ type block struct {
+ 	cmd   string
++	color   string
+ 	inSh  bool
+ 	upInt int
+ 	upSig int
+@@ -49,6 +50,11 @@ func main() {
+ 	sigChan := make(chan os.Signal, 1024)
+ 	signalMap := make(map[os.Signal][]block)
+ 
++	if _, ok := schemes[resetscheme]; !ok {
++		log.Printf("Reset scheme %q is not valid; using default '0x1'", resetscheme)
++		schemes[resetscheme] = 0x1
++	}
++
+ 	for i := 0; i < len(blocks); i++ { // initialize blocks
+ 		go func(i int) {
+ 			blocks[i].pos = i
+@@ -79,7 +85,14 @@ func main() {
+ 		for range updateChan {
+ 			for i := 0; i < len(blocks); i++ {
+ 				if barBytesArr[i] != nil {
++					scheme, ok := schemes[blocks[i].color]
++					if !ok {
++						scheme = schemes[resetscheme]
++					}
++
++					finalBytesBuffer.WriteByte(schemes[resetscheme])
+ 					finalBytesBuffer.Write(delim)
++					finalBytesBuffer.WriteByte(scheme)
+ 					finalBytesBuffer.Write(barBytesArr[i])
+ 				}
+ 			}
+-- 
+2.35.1
+
