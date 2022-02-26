@@ -27,3 +27,28 @@ var (
 		{cmd: "internet", upInt: 5, upSig: 4},
 	}
 )
+
+/* Quick list of modules Update Signals
+ * 1 clock
+ * 2 sip
+ * 3 battery
+ * 4 internet
+ * 5 weather
+ * 6 news
+ * 7 torrent
+ * 8 pacpackages
+ * 9 recicon
+ * 10 volume
+ * 11 music
+ * 12 mailbox
+ * 13 cpu
+ * 14 memory
+ * 15 disk
+ * 16 nettraf
+ * 17 crypto
+ * 18 astrological
+ * 19 georona
+ * 20 help-icon
+ * 21 vpnstat
+ * 22 cpubar
+ */
