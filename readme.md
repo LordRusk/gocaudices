@@ -24,9 +24,11 @@ The `block` definition of `{cmd: "volume", upSig: 10},` would be updated like `k
 ## Patches
 Patches are hosted in this repo in `patches/*patch*`. To apply patches: `patch -p1 < path/to/patch.diff`. To create a proper patch, refer to [hacking](https://suckless.org/hacking/). If you would like to contribute a patch or feature, create a pull request.
 
-[complexdelim](https://github.com/LordRusk/gocaudices/tree/master/patches/complexdelim)
+• [complexdelim](https://github.com/LordRusk/gocaudices/tree/master/patches/complexdelim)
 
-[status2d](https://github.com/LordRusk/gocaudices/tree/master/patches/status2d)
+• [status2d](https://github.com/LordRusk/gocaudices/tree/master/patches/status2d)
+
+• [statuscmd](https://github.com/LordRusk/gocaudices/tree/master/patches/statuscmd)
 
 ## (Non)-Features
 + Multiple blocks can have the same update signal.
@@ -34,4 +36,4 @@ Patches are hosted in this repo in `patches/*patch*`. To apply patches: `patch -
 ## FQA -- Frequently Questioned Answers
 + Does it have bar click-ability?
 
-	• No, but if you'd like to create a patch, create a pull request!
+	• Yes.
