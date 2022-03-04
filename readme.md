@@ -28,6 +28,10 @@ Patches are hosted in this repo in `patches/*patch*`. To apply patches: `patch -
 
 [status2d](https://github.com/LordRusk/gocaudices/tree/master/patches/status2d)
 
+[statuscolors](https://github.com/LordRusk/gocaudices/tree/master/patches/statuscolors)
+
+[icons](https://github.com/LordRusk/gocaudices/tree/master/patches/icons)
+
 ## (Non)-Features
 + Multiple blocks can have the same update signal.
 
