@@ -79,12 +79,12 @@ func main() {
 		for range updateChan {
 			for i := 0; i < len(blocks); i++ {
 				if barBytesArr[i] != nil {
-					finalBytesBuffer.Write(delim)
+					finalBytesBuffer.WriteString(delim)
 					finalBytesBuffer.Write(barBytesArr[i])
 				}
 			}
 
-			finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), delim)
+			finalBytes := finalBytesBuffer.Bytes()[len(delim):]
 			xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes) // set the root window name
 			finalBytesBuffer.Reset()
 		}
