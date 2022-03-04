@@ -1,0 +1,80 @@
+From 187e2c700e32f76704aa54dc0a71de5d2a58b1e4 Mon Sep 17 00:00:00 2001
+From: Ethan Marshall <ethan@ethanjmarshall.co.uk>
+Date: Sat, 26 Feb 2022 14:34:57 +0000
+Subject: [PATCH] Add static icon support
+
+As seen in dwmblocks
+---
+ blocks.go | 28 ++++++++++++++--------------
+ main.go   |  5 +++++
+ 2 files changed, 19 insertions(+), 14 deletions(-)
+
+diff --git a/blocks.go b/blocks.go
+index 24d422f..f12be81 100644
+--- a/blocks.go
++++ b/blocks.go
+@@ -6,24 +6,24 @@ var (
+ 	cmdstropt = "-c"        // command string opt for shell
+ 
+ 	blocks = []block{
+-		{cmd: "recicon", upSig: 9},
+-		{cmd: "music", upSig: 11},
+-		{cmd: "pacpackages", upSig: 8},
+-		{cmd: "news", upSig: 6},
++		{icon: '', cmd: "recicon", upSig: 9},
++		{icon: '', cmd: "music", upSig: 11},
++		{icon: '', cmd: "pacpackages", upSig: 8},
++		{icon: '', cmd: "news", upSig: 6},
+ 		{cmd: "georona | cut -d' ' -f1,3", inSh: true, upInt: 18000, upSig: 19}, // example of command that is run in shell
+-		{cmd: "torrent", upInt: 10, upSig: 7},
+-		{cmd: "memory", upInt: 6, upSig: 14},
+-		{cmd: "cpu", upInt: 3, upSig: 13},
++		{icon: '', cmd: "torrent", upInt: 10, upSig: 7},
++		{icon: '', cmd: "memory", upInt: 6, upSig: 14},
++		{icon: '', cmd: "cpu", upInt: 3, upSig: 13},
+ 		{cmd: "cpubars", upInt: 1, upSig: 22},
+-		{cmd: "disk /home", upInt: 7, upSig: 15},
+-		{cmd: "disk", upInt: 7, upSig: 15},
+-		{cmd: "astrological", upInt: 18000, upSig: 18},
+-		{cmd: "weather", upInt: 18000, upSig: 5},
+-		{cmd: "mailbox", upSig: 12},
++		{icon: '', cmd: "disk /home", upInt: 7, upSig: 15},
++		{icon: '', cmd: "disk", upInt: 7, upSig: 15},
++		{icon: '', cmd: "astrological", upInt: 18000, upSig: 18},
++		{icon: '', cmd: "weather", upInt: 18000, upSig: 5},
++		{icon: '﫮', cmd: "mailbox", upSig: 12},
+ 		{cmd: "nettraf", upInt: 1, upSig: 16},
+ 		{cmd: "volume", upSig: 10},
+ 		{cmd: "battery", upInt: 5, upSig: 3},
+-		{cmd: "clock", upSig: 1},
+-		{cmd: "internet", upInt: 5, upSig: 4},
++		{icon: '', cmd: "clock", upSig: 1},
++		{icon: '', cmd: "internet", upInt: 5, upSig: 4},
+ 	}
+ )
+diff --git a/main.go b/main.go
+index 5f60ba2..a576529 100644
+--- a/main.go
++++ b/main.go
+@@ -16,6 +16,7 @@ import (
+ 
+ type block struct {
+ 	cmd   string
++	icon  rune
+ 	inSh  bool
+ 	upInt int
+ 	upSig int
+@@ -81,6 +82,10 @@ func main() {
+ 				if barBytesArr[i] != nil {
+ 					finalBytesBuffer.Write(delim)
+ 					finalBytesBuffer.Write(barBytesArr[i])
++
++					if blocks[i].icon != '\x00' {
++						finalBytesBuffer.WriteRune(blocks[i].icon)
++					}
+ 				}
+ 			}
+ 
+-- 
+2.35.1
+
