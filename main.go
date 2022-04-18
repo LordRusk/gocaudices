@@ -31,7 +31,7 @@ var barBytesArr = make([][]byte, len(blocks))
 func (b *block) run() {
 	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
 	if err != nil {
-		log.Printf("Failed to update `%s`: %s\n", b.Cmd, err)
+		log.Printf("block %q update failed: %s\n", b.Cmd, err.Error())
 		return
 	}
 
@@ -42,7 +42,7 @@ func (b *block) run() {
 func main() {
 	x, err := xgb.NewConn() // connect to X
 	if err != nil {
-		log.Fatalf("Cannot connect to X: %s\n", err)
+		log.Fatalf("X connection failed: %s\n", err.Error())
 	}
 	defer x.Close()
 	root := xproto.Setup(x).DefaultScreen(x).Root
