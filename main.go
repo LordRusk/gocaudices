@@ -50,7 +50,8 @@ func main() {
 	sigChan := make(chan os.Signal, 1024)
 	signalMap := make(map[os.Signal][]block)
 
-	for i, elem := range blocks { // initialize blocks
+	// initialize blocks
+	for i := range blocks {
 		go func(bl *block, i int) {
 			bl.pos = i
 
@@ -72,7 +73,7 @@ func main() {
 					bl.run()
 				}
 			}
-		}(&elem, i)
+		}(&blocks[i], i)
 	}
 
 	go func() { // update bar on signal
