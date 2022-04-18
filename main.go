@@ -50,35 +50,35 @@ func main() {
 	sigChan := make(chan os.Signal, 1024)
 	signalMap := make(map[os.Signal][]block)
 
-	for i := 0; i < len(blocks); i++ { // initialize blocks
-		go func(i int) {
-			blocks[i].pos = i
+	for i, elem := range blocks { // initialize blocks
+		go func(bl *block, i int) {
+			bl.pos = i
 
-			if blocks[i].Shell {
-				blocks[i].args = []string{shell, cmdstropt, blocks[i].Cmd}
+			if bl.Shell {
+				bl.args = []string{shell, cmdstropt, bl.Cmd}
 			} else {
-				blocks[i].args = strings.Split(blocks[i].Cmd, " ")
+				bl.args = strings.Split(bl.Cmd, " ")
 			}
 
-			if blocks[i].Signal != 0 {
-				signal.Notify(sigChan, syscall.Signal(34+blocks[i].Signal))
-				signalMap[syscall.Signal(34+blocks[i].Signal)] = append(signalMap[syscall.Signal(34+blocks[i].Signal)], blocks[i])
+			if bl.Signal != 0 {
+				signal.Notify(sigChan, syscall.Signal(34+bl.Signal))
+				signalMap[syscall.Signal(34+bl.Signal)] = append(signalMap[syscall.Signal(34+bl.Signal)], *bl)
 			}
 
-			blocks[i].run() // initially build bar
-			if blocks[i].Interval != 0 {
+			bl.run() // initially build bar
+			if bl.Interval != 0 {
 				for {
-					time.Sleep(time.Duration(blocks[i].Interval) * time.Second)
-					blocks[i].run()
+					time.Sleep(time.Duration(bl.Interval) * time.Second)
+					bl.run()
 				}
 			}
-		}(i)
+		}(&elem, i)
 	}
 
 	go func() { // update bar on signal
 		var finalBytesBuffer bytes.Buffer
 		for range updateChan {
-			for i := 0; i < len(blocks); i++ {
+			for i := range blocks {
 				if barBytesArr[i] != nil {
 					finalBytesBuffer.WriteString(delim)
 					finalBytesBuffer.Write(barBytesArr[i])
