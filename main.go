@@ -15,33 +15,34 @@ import (
 )
 
 type block struct {
-	cmd   string
-	inSh  bool
-	upInt int
-	upSig int
+	Cmd      string
+	Shell    bool
+	Interval uint
+	Signal   uint
 
-	args []string // used internally
-	pos  int      // used internally
+	// Internal
+	args []string
+	pos  int
 }
 
-var updateChan = make(chan struct{})
+var updateChan = make(chan int)
 var barBytesArr = make([][]byte, len(blocks))
 
 func (b *block) run() {
 	outputBytes, err := exec.Command(b.args[0], b.args[1:]...).Output()
 	if err != nil {
-		log.Printf("Failed to update `%s`: %s\n", b.cmd, err)
+		log.Printf("block %q update failed: %s\n", b.Cmd, err.Error())
 		return
 	}
 
 	barBytesArr[b.pos] = bytes.TrimSpace(bytes.Split(outputBytes, []byte("\n"))[0])
-	updateChan <- struct{}{}
+	updateChan <- 1
 }
 
 func main() {
 	x, err := xgb.NewConn() // connect to X
 	if err != nil {
-		log.Fatalf("Cannot connect to X: %s\n", err)
+		log.Fatalf("X connection failed: %s\n", err.Error())
 	}
 	defer x.Close()
 	root := xproto.Setup(x).DefaultScreen(x).Root
@@ -49,35 +50,35 @@ func main() {
 	sigChan := make(chan os.Signal, 1024)
 	signalMap := make(map[os.Signal][]block)
 
-	for i := 0; i < len(blocks); i++ { // initialize blocks
-		go func(i int) {
-			blocks[i].pos = i
+	for i, elem := range blocks { // initialize blocks
+		go func(bl *block, i int) {
+			bl.pos = i
 
-			if blocks[i].inSh {
-				blocks[i].args = []string{shell, cmdstropt, blocks[i].cmd}
+			if bl.Shell {
+				bl.args = []string{shell, cmdstropt, bl.Cmd}
 			} else {
-				blocks[i].args = strings.Split(blocks[i].cmd, " ")
+				bl.args = strings.Split(bl.Cmd, " ")
 			}
 
-			if blocks[i].upSig != 0 {
-				signal.Notify(sigChan, syscall.Signal(34+blocks[i].upSig))
-				signalMap[syscall.Signal(34+blocks[i].upSig)] = append(signalMap[syscall.Signal(34+blocks[i].upSig)], blocks[i])
+			if bl.Signal != 0 {
+				signal.Notify(sigChan, syscall.Signal(34+bl.Signal))
+				signalMap[syscall.Signal(34+bl.Signal)] = append(signalMap[syscall.Signal(34+bl.Signal)], *bl)
 			}
 
-			blocks[i].run() // initially build bar
-			if blocks[i].upInt != 0 {
+			bl.run() // initially build bar
+			if bl.Interval != 0 {
 				for {
-					time.Sleep(time.Duration(blocks[i].upInt) * time.Second)
-					blocks[i].run()
+					time.Sleep(time.Duration(bl.Interval) * time.Second)
+					bl.run()
 				}
 			}
-		}(i)
+		}(&elem, i)
 	}
 
 	go func() { // update bar on signal
 		var finalBytesBuffer bytes.Buffer
 		for range updateChan {
-			for i := 0; i < len(blocks); i++ {
+			for i := range blocks {
 				if barBytesArr[i] != nil {
 					finalBytesBuffer.WriteString(delim)
 					finalBytesBuffer.Write(barBytesArr[i])

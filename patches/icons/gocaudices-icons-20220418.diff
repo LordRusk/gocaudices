@@ -1,0 +1,81 @@
+From c03eebcaa3ac1752b129533285df22bd96dafb3c Mon Sep 17 00:00:00 2001
+From: Ethan Marshall <ethan@ethanjmarshall.co.uk>
+Date: Mon, 18 Apr 2022 23:48:30 +0100
+Subject: [PATCH] Add static icon support
+
+Updated for 2022 idiomatic rewrite
+---
+ blocks.go | 28 ++++++++++++++--------------
+ main.go   |  5 +++++
+ 2 files changed, 19 insertions(+), 14 deletions(-)
+
+diff --git a/blocks.go b/blocks.go
+index bc461f5..076cc5f 100644
+--- a/blocks.go
++++ b/blocks.go
+@@ -6,25 +6,25 @@ var (
+ 	cmdstropt = "-c" // command string opt for shell
+ 
+ 	blocks = []block{
+-		{Cmd: "recicon", Signal: 9},
+-		{Cmd: "music", Signal: 11},
+-		{Cmd: "pacpackages", Signal: 8},
+-		{Cmd: "news", Signal: 6},
++		{Icon: '', Cmd: "recicon", Signal: 9},
++		{Icon: '', Cmd: "music", Signal: 11},
++		{Icon: '', Cmd: "pacpackages", Signal: 8},
++		{Icon: '', Cmd: "news", Signal: 6},
+ 		{Cmd: "georona | cut -d' ' -f1,3", Shell: true, Interval: 18000, Signal: 19}, // example of command that is run in shell
+-		{Cmd: "torrent", Interval: 10, Signal: 7},
+-		{Cmd: "memory", Interval: 6, Signal: 14},
+-		{Cmd: "cpu", Interval: 3, Signal: 13},
++		{Icon: '', Cmd: "torrent", Interval: 10, Signal: 7},
++		{Icon: '', Cmd: "memory", Interval: 6, Signal: 14},
++		{Icon: '', Cmd: "cpu", Interval: 3, Signal: 13},
+ 		{Cmd: "cpubars", Interval: 1, Signal: 22},
+-		{Cmd: "disk /home", Interval: 7, Signal: 15},
+-		{Cmd: "disk", Interval: 7, Signal: 15},
+-		{Cmd: "astrological", Interval: 18000, Signal: 18},
+-		{Cmd: "weather", Interval: 18000, Signal: 5},
+-		{Cmd: "mailbox", Signal: 12},
++		{Icon: '', Cmd: "disk /home", Interval: 7, Signal: 15},
++		{Icon: '', Cmd: "disk", Interval: 7, Signal: 15},
++		{Icon: '', Cmd: "astrological", Interval: 18000, Signal: 18},
++		{Icon: '', Cmd: "weather", Interval: 18000, Signal: 5},
++		{Icon: '﫮', Cmd: "mailbox", Signal: 12},
+ 		{Cmd: "nettraf", Interval: 1, Signal: 16},
+ 		{Cmd: "volume", Signal: 10},
+ 		{Cmd: "battery", Interval: 5, Signal: 3},
+-		{Cmd: "clock", Signal: 1},
+-		{Cmd: "internet", Interval: 5, Signal: 4},
++		{Icon: '', Cmd: "clock", Signal: 1},
++		{Icon: '', Cmd: "internet", Interval: 5, Signal: 4},
+ 	}
+ )
+ 
+diff --git a/main.go b/main.go
+index 0316739..a8b7ebd 100644
+--- a/main.go
++++ b/main.go
+@@ -16,6 +16,7 @@ import (
+ 
+ type block struct {
+ 	Cmd      string
++	Icon     rune
+ 	Shell    bool
+ 	Interval uint
+ 	Signal   uint
+@@ -82,6 +83,10 @@ func main() {
+ 				if barBytesArr[i] != nil {
+ 					finalBytesBuffer.WriteString(delim)
+ 					finalBytesBuffer.Write(barBytesArr[i])
++
++					if blocks[i].icon != '\x00' {
++						finalBytesBuffer.WriteRune(blocks[i].icon)
++					}
+ 				}
+ 			}
+ 
+-- 
+2.35.2
+
