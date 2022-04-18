@@ -6,25 +6,25 @@ var (
 	cmdstropt = "-c" // command string opt for shell
 
 	blocks = []block{
-		{cmd: "recicon", upSig: 9},
-		{cmd: "music", upSig: 11},
-		{cmd: "pacpackages", upSig: 8},
-		{cmd: "news", upSig: 6},
-		{cmd: "georona | cut -d' ' -f1,3", inSh: true, upInt: 18000, upSig: 19}, // example of command that is run in shell
-		{cmd: "torrent", upInt: 10, upSig: 7},
-		{cmd: "memory", upInt: 6, upSig: 14},
-		{cmd: "cpu", upInt: 3, upSig: 13},
-		{cmd: "cpubars", upInt: 1, upSig: 22},
-		{cmd: "disk /home", upInt: 7, upSig: 15},
-		{cmd: "disk", upInt: 7, upSig: 15},
-		{cmd: "astrological", upInt: 18000, upSig: 18},
-		{cmd: "weather", upInt: 18000, upSig: 5},
-		{cmd: "mailbox", upSig: 12},
-		{cmd: "nettraf", upInt: 1, upSig: 16},
-		{cmd: "volume", upSig: 10},
-		{cmd: "battery", upInt: 5, upSig: 3},
-		{cmd: "clock", upSig: 1},
-		{cmd: "internet", upInt: 5, upSig: 4},
+		{Cmd: "recicon", Signal: 9},
+		{Cmd: "music", Signal: 11},
+		{Cmd: "pacpackages", Signal: 8},
+		{Cmd: "news", Signal: 6},
+		{Cmd: "georona | cut -d' ' -f1,3", Shell: true, Interval: 18000, Signal: 19}, // example of command that is run in shell
+		{Cmd: "torrent", Interval: 10, Signal: 7},
+		{Cmd: "memory", Interval: 6, Signal: 14},
+		{Cmd: "cpu", Interval: 3, Signal: 13},
+		{Cmd: "cpubars", Interval: 1, Signal: 22},
+		{Cmd: "disk /home", Interval: 7, Signal: 15},
+		{Cmd: "disk", Interval: 7, Signal: 15},
+		{Cmd: "astrological", Interval: 18000, Signal: 18},
+		{Cmd: "weather", Interval: 18000, Signal: 5},
+		{Cmd: "mailbox", Signal: 12},
+		{Cmd: "nettraf", Interval: 1, Signal: 16},
+		{Cmd: "volume", Signal: 10},
+		{Cmd: "battery", Interval: 5, Signal: 3},
+		{Cmd: "clock", Signal: 1},
+		{Cmd: "internet", Interval: 5, Signal: 4},
 	}
 )
 
