@@ -86,7 +86,7 @@ func main() {
 				}
 			}
 
-			finalBytes := finalBytesBuffer.Bytes()[len(delim):]
+			finalBytes := bytes.TrimPrefix(finalBytesBuffer.Bytes(), []byte(delim))
 			xproto.ChangeProperty(x, xproto.PropModeReplace, root, xproto.AtomWmName, xproto.AtomString, 8, uint32(len(finalBytes)), finalBytes) // set the root window name
 			finalBytesBuffer.Reset()
 		}
