@@ -17,8 +17,8 @@ import (
 type block struct {
 	Cmd      string
 	Shell    bool
-	Interval int
-	Signal   int
+	Interval uint
+	Signal   uint
 
 	// Internal
 	args []string
