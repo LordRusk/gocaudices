@@ -25,7 +25,7 @@ type block struct {
 	pos  int
 }
 
-var updateChan = make(chan struct{})
+var updateChan = make(chan int)
 var barBytesArr = make([][]byte, len(blocks))
 
 func (b *block) run() {
@@ -36,7 +36,7 @@ func (b *block) run() {
 	}
 
 	barBytesArr[b.pos] = bytes.TrimSpace(bytes.Split(outputBytes, []byte("\n"))[0])
-	updateChan <- struct{}{}
+	updateChan <- 1
 }
 
 func main() {
