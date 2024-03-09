@@ -37,3 +37,22 @@ Patches are hosted in this repo in `patches/*patch*`. To apply patches: `patch -
 + Does it have bar click-ability?
 
 	• Yes.
+
+## AWESOME BARS
+dwm bars that I think are awesome! check them out and give them a star!
+
+• [sysmon](https://github.com/blmayer/sysmon/tree/main) I would use this if I hadn't made zara
+
+• [spoon](https://git.2f30.org/spoon/) I don't know much C but this is great
+
+• [rsblocks](https://github.com/MustafaSalih1993/rsblocks) I don't know much Rust, but featureful and well starred, makes me wanna get my status emoji game up to par
+
+• [mblocks](https://gitlab.com/mhdy/mblocks) another great rusty bar
+
+• [integrated-status-text](https://dwm.suckless.org/patches/integrated-status-text) the way god intended
+  
+• [gods](https://github.com/schachmat/gods) ICONIC
+
+• [dwmblocks-async](https://github.com/UtkarshVerma/dwmblocks-async) Awesome! I wrote this project because dwmblocks wasn't async...and I've lived without bar clickability since...maybe should have gone with this and learned C!
+
+•[Luke Smith's Dwmblocks](https://github.com/LukeSmithxyz/dwmblocks) how could I forget where it all began?
